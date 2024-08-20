@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QInputDialog,QDialog,QVBoxLayout, QSpinBox,
 from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt, QRect, QPoint
 from Processing import ImageProcessor
+import pickle
 
 class CanvasWidget(QWidget):
     def __init__(self, parent=None):
@@ -121,7 +122,7 @@ class CanvasWidget(QWidget):
     def apply_grayscale(self):
         self.processor.apply_grayscale()
         self.qt_image = self.processor.get_qt_image()
-        self.save_actions.append(("apply_grayscale"))
+        self.save_actions.append(("apply_grayscale",0))
         self.update()
 
     def apply_zoom(self, zoom):
@@ -181,11 +182,13 @@ class CanvasWidget(QWidget):
         if self.processor.cv_image is not None:
             self.processor.flip()
             self.qt_image = self.processor.get_qt_image()
-            self.save_actions.append(("apply_flip"))
+            self.save_actions.append(("apply_flip",0))
             self.update()
 
     def save(self):
         print(self.save_actions)
+        with open("data.pkl", "wb") as f:
+            pickle.dump(self.save_actions, f)
 class Popup(QDialog):
     def __init__(self,window_title,text1,text2="",step=1,step2=0):
         super().__init__()

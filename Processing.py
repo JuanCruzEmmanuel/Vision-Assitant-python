@@ -117,3 +117,47 @@ class ImageProcessor:
                 return QImage(self.cv_image.data, width, height, 3 * width, QImage.Format_BGR888)
 
         return None
+
+
+def Pipeline(src=None,pipe=None):
+    """
+
+    :param src: cv2 image
+    :param pipe: tuple with pipeline action
+    :return: proccesing cv2 image
+    """
+
+    app = pipe[0]
+    if app == "load_image":
+        src = cv2.imread(pipe[1])
+        return src
+        """
+        pipe[1]: image PATH 
+        """
+
+
+    elif app == "apply_grayscale":
+        src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        return src
+
+
+    elif app =="apply_zoom":
+        if len(src.shape) == 3:
+            y, x, _ = src.shape
+            src = cv2.resize(src, (x*pipe[1], y*pipe[1]), cv2.INTER_CUBIC)
+            return src
+        else:
+            y, x = src.shape
+            src = cv2.resize(src,(x*pipe[1], y*pipe[1]), cv2.INTER_CUBIC)
+            return src
+    elif app == "apply_threshold_filter":
+        if len(src.shape) == 2:
+            src = cv2.bitwise_not(src)
+            src = cv2.adaptiveThreshold(src, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                  cv2.THRESH_BINARY, pipe[1], pipe[2])
+            return src
+
+    elif app == "apply_flip":
+        return cv2.rotate(src, cv2.ROTATE_180)
+
+
