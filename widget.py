@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QInputDialog,QDialog,QVBoxLayout, QSpinBox, QLabel, QDialogButtonBox
+from PyQt5.QtWidgets import QWidget, QInputDialog,QDialog,QVBoxLayout, QSpinBox, QLabel, QDialogButtonBox,QDoubleSpinBox
 from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt, QRect, QPoint
 from Processing import ImageProcessor
@@ -19,6 +19,7 @@ class CanvasWidget(QWidget):
         self.patron = False
         self.ejes_ = False
         self.save_actions = []
+        self.GS = False
     def load_image(self, file_name):
         self.processor.load_image(file_name)
         self.qt_image = self.processor.get_qt_image()
@@ -47,10 +48,13 @@ class CanvasWidget(QWidget):
                 painter.drawRect(rect)
                 painter.drawText(rect.topLeft(), label)
                 if self.ejes_ == True:
+                    painter_line = QPainter(self)
+                    painter_line.translate(self.translation)  # Aplicar desplazamiento
+                    painter_line.scale(self.scale_factor, self.scale_factor)  # Aplicar escala
+                    painter_line.setPen(QPen(Qt.red, 2, Qt.DashDotLine))
                     y,h,x,w = self.processor.ejes()
-                    painter.drawLine((h+y)//2,x,(h+y)//2,w)
-                    painter.drawLine(y,w-x,h,w-x)
-
+                    painter_line.drawLine(x-10,(y+h)//2,x+w+10,(y+h)//2)
+                    painter_line.drawLine((2*x+w)//2, y-10, (2*x+w)//2, y+h +10)
             if self.start_point and self.end_point:
                 painter.setPen(QPen(Qt.blue, 2, Qt.DashLine))  # Color provisional del recuadro
                 painter.drawRect(QRect(self.start_point, self.end_point))
@@ -123,6 +127,7 @@ class CanvasWidget(QWidget):
         self.processor.apply_grayscale()
         self.qt_image = self.processor.get_qt_image()
         self.save_actions.append(("apply_grayscale",0))
+        self.GS = True
         self.update()
 
     def apply_zoom(self, zoom):
@@ -166,17 +171,31 @@ class CanvasWidget(QWidget):
             self.patrones.append((rect,"Patron"))
             self.save_actions.append(("load_patern", path))
             self.update()
+
+    def recorte_imagen_directo(self,path):
+        if self.processor.cv_image is not None:
+            self.processor.recorte_directo(path)
+            self.qt_image = self.processor.get_qt_image()
+            print("aa")
+            self.update()
+
+
     def ejes(self):
         if self.processor.cv_image is not None:
-            self.ejes_ =True
-            self.update()
+            if self.ejes_ == False:
+                self.ejes_ =True
+                self.update()
+            else:
+                self.ejes_ =False
+                self.update()
 
     def apply_threshold_filter(self,kernel,c):
         if self.processor.cv_image is not None:
-            self.processor.adaptiveThreshold(kernel,c)
-            self.qt_image = self.processor.get_qt_image()
-            self.save_actions.append(("apply_threshold_filter", kernel,c))
-            self.update()
+            if self.GS:
+                self.processor.adaptiveThreshold(kernel,c)
+                self.qt_image = self.processor.get_qt_image()
+                self.save_actions.append(("apply_threshold_filter", kernel,c))
+                self.update()
 
     def apply_flip(self):
         if self.processor.cv_image is not None:
@@ -185,12 +204,42 @@ class CanvasWidget(QWidget):
             self.save_actions.append(("apply_flip",0))
             self.update()
 
+    def apply_brightnessAndContrast(self,alpha,beta):
+        if self.processor.cv_image is not None:
+            self.processor.brightnessAndContrast(alpha,beta)
+            self.qt_image = self.processor.get_qt_image()
+            self.save_actions.append(("apply_brightnessAndContrast",alpha,beta))
+            self.update()
+
     def save(self):
         print(self.save_actions)
         with open("data.pkl", "wb") as f:
             pickle.dump(self.save_actions, f)
+
+    def dilate(self,k,iter):
+
+        self.processor.DILATE(kernel=k,iter=iter)
+        self.qt_image = self.processor.get_qt_image()
+        self.save_actions.append(("dilate", k, iter))
+        self.update()
+
+    def erode(self,k,iter):
+        self.processor.ERODE(kernel=k,iter=iter)
+        self.qt_image = self.processor.get_qt_image()
+        self.save_actions.append(("erode", k, iter))
+        self.update()
+
+
+    @property
+    def update_status(self):
+        return self.GS
+    @update_status.setter
+    def update_status(self,value):
+        if self.GS !=value:
+            self.GS =value
+            self.GS_changed.emit(self.GS)
 class Popup(QDialog):
-    def __init__(self,window_title,text1,text2="",step=1,step2=0):
+    def __init__(self,window_title,text1,text2="",step=1,step2=0, min1=0, min2=0, max1=100, max2=100):
         super().__init__()
 
         self.setWindowTitle(window_title)
@@ -199,23 +248,29 @@ class Popup(QDialog):
         layout = QVBoxLayout()
 
         # Selección del primer kernel
-        self.kernel1_input = QSpinBox(self)
-        self.kernel1_input.setRange(1, 100)  # Ajusta el rango según necesites
-        self.kernel1_input.setSingleStep(step)
+        if isinstance(step,float) == True:
+            self.value1_input = QDoubleSpinBox(self)
+        else:
+            self.value1_input = QSpinBox(self)
+        self.value1_input.setRange(min1, max1)
+        self.value1_input.setSingleStep(step)
         layout.addWidget(QLabel(text1))
-        layout.addWidget(self.kernel1_input)
+        layout.addWidget(self.value1_input)
 
-        # Selección del segundo kernel
+
         if text2=="":
             pass
         else:
-            self.kernel2_input = QSpinBox(self)
-            self.kernel2_input.setRange(1, 100)  # Ajusta el rango según necesites
+            if isinstance(step2,float) == True:
+                self.value2_input = QDoubleSpinBox(self)
+            else:
+                self.value2_input = QSpinBox(self)
+            self.value2_input.setRange(min2, max2)
             if step2 == 0: #Si no se especifica, entonces se selecciona el mismo
                 step2 = step
-            self.kernel2_input.setSingleStep(step2)
+            self.value2_input.setSingleStep(step2)
             layout.addWidget(QLabel(text2))
-            layout.addWidget(self.kernel2_input)
+            layout.addWidget(self.value2_input)
 
         # Botones OK y Cancelar
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -226,9 +281,9 @@ class Popup(QDialog):
         # Aplicar layout
         self.setLayout(layout)
 
-    def getKernels(self):
-        if self.kernel2_input is not None:
-            return self.kernel1_input.value(), self.kernel2_input.value()
+    def getValues(self):
+        if self.value2_input is not None:
+            return self.value1_input.value(), self.value2_input.value()
         else:
-            return self.kernel1_input.value()
+            return self.value1_input.value()
 

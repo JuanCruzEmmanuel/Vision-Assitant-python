@@ -11,6 +11,7 @@ class ImageProcessor:
         self.centro_rotacion = (0,0)
         self.angulo_rotacion = 0
         self.rot_hist = [] #Historial de rotacion
+        self.binar = False
 
     def load_image(self, image_path):
         # Cargar la imagen usando OpenCV
@@ -27,6 +28,9 @@ class ImageProcessor:
         cv2.imwrite(nombre+".jpeg",muestra)
 
 
+    def color_mask(self,range,range_2=None):
+        pass
+
     def PATRON(self,path):
         self.patron = cv2.imread(path,0)
         fig = self.cv_image.copy()
@@ -40,9 +44,28 @@ class ImageProcessor:
             punto_fin = (punto_inicio[0] + ancho_patron, punto_inicio[1] + alto_patron)
         try:
             self.patrones.append((path,(punto_inicio[1],alto_patron, punto_inicio[0],ancho_patron)))
-            return punto_inicio[1],alto_patron, punto_inicio[0],ancho_patron
+            return punto_inicio[1],alto_patron, punto_inicio[0],ancho_patron #y,h,x,w
         except:
             return 0,0,0,0
+
+    def recorte_directo(self,path):
+        self.patron = cv2.imread(path,0)
+        fig = self.cv_image.copy()
+        metodo = cv2.TM_CCOEFF_NORMED
+        coincidencias = cv2.matchTemplate(cv2.cvtColor(fig, cv2.COLOR_BGR2GRAY), self.patron, metodo)
+        _, max_val, _, max_loc = cv2.minMaxLoc(coincidencias)
+        if max_val != 0.0:
+            ancho_patron, alto_patron = self.patron.shape[::-1]
+            punto_inicio = max_loc
+            punto_fin = (punto_inicio[0] + ancho_patron, punto_inicio[1] + alto_patron)
+
+        print(ancho_patron,alto_patron)
+        print(punto_inicio)
+        self.cv_image = self.cv_image[punto_inicio[1]:punto_inicio[1]+alto_patron,punto_inicio[0]:punto_inicio[0]+ancho_patron].copy()
+        #cv2.imshow("test",self.cv_image)
+        #cv2.waitKey(0)
+        self.history.append(self.cv_image.copy())
+
 
     def ejes(self):
         y,h,x,w = self.patrones[-1][1]
@@ -52,6 +75,8 @@ class ImageProcessor:
         if self.cv_image is not None:
             if len(self.cv_image.shape) != 2:
                 self.cv_image = cv2.cvtColor(self.cv_image,cv2.COLOR_BGR2GRAY)
+                #cv2.imshow("gs",self.cv_image)
+                #cv2.waitKey(0)
                 self.history.append(self.cv_image.copy())
             else:
                 pass
@@ -94,10 +119,12 @@ class ImageProcessor:
         if self.cv_image is not None:
             try:
                 if len(self.cv_image.shape) == 2:
-                    src = cv2.bitwise_not(self.cv_image)
-                    self.cv_image = cv2.adaptiveThreshold(src,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                    #src = cv2.bitwise_not(self.cv_image)
+                    self.cv_image = cv2.adaptiveThreshold(self.cv_image,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                                           cv2.THRESH_BINARY,blocksize,c)
+                    self.cv_image = cv2.bitwise_not(self.cv_image)
                     self.history.append(self.cv_image.copy())
+
                 else:
                     pass
             except Exception as e:
@@ -107,12 +134,43 @@ class ImageProcessor:
 
     def flip(self):
         self.cv_image = cv2.rotate(self.cv_image,cv2.ROTATE_180)
-        self.history.append(self.cv_image)
+        self.history.append(self.cv_image.copy())
+
+    def DILATE(self,kernel,iter):
+        if self.cv_image is not None:
+
+            KERNEL = np.ones((kernel,kernel),np.uint8)
+
+            self.cv_image = cv2.dilate(self.cv_image,kernel=KERNEL,iterations=iter)
+
+            self.history.append(self.cv_image.copy())
+
+    def ERODE(self,kernel,iter):
+        if self.cv_image is not None:
+
+            KERNEL = np.ones((kernel,kernel),np.uint8)
+
+            self.cv_image = cv2.erode(self.cv_image,kernel=KERNEL,iterations=iter)
+
+            self.history.append(self.cv_image.copy())
+
+    def brightnessAndContrast(self,alpha,beta):
+        """
+
+        :param alpha: contrast factor
+        :param beta: brightness factor
+        :return: alpha*image+beta
+        """
+
+        self.cv_image = cv2.convertScaleAbs(self.cv_image,alpha = alpha, beta= beta)
+        self.history.append(self.cv_image.copy())
+
     def get_qt_image(self):
         if self.cv_image is not None:
             height, width = self.cv_image.shape[:2]
+            print(height,width)
             if len(self.cv_image.shape) == 2:  # Grayscale
-                return QImage(self.cv_image.data, width, height, QImage.Format_Grayscale8)
+                return QImage(self.cv_image.data, width, height,width,QImage.Format_Grayscale8)
             else:  # Color
                 return QImage(self.cv_image.data, width, height, 3 * width, QImage.Format_BGR888)
 
