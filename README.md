@@ -11,6 +11,12 @@ Load an image and patterns, enable axes for better control of the image.
 Apply black and white filters, rotations, adaptive filters, and zoom.
 The configuration can then be saved to apply it as a pipeline.
 
+version 1.0.1 includes the following features:
+
+Error in black and white convertion ---> SOLVED
+Apply dilate filter
+Apply erode filter
+
 Status: Development
 
 Contact: juancruznoya@mi.unc.edu.ar
