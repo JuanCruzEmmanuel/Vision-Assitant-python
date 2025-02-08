@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VisionAssistance</class>
+ <widget class="QMainWindow" name="VisionAssistance">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1354</width>
+    <height>882</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VisionAssistance</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QFrame" name="Conteiner">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QFrame" name="img_conteiner">
+       <property name="geometry">
+        <rect>
+         <x>-10</x>
+         <y>0</y>
+         <width>1341</width>
+         <height>701</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(232, 232, 232);</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>-1</y>
+          <width>1341</width>
+          <height>701</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="img_display"/>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="pipeline">
+       <property name="geometry">
+        <rect>
+         <x>-1</x>
+         <y>699</y>
+         <width>1341</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(239, 239, 239);</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1354</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="Open_Image"/>
+    <addaction name="Exit"/>
+    <addaction name="Save_Image"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="Undo"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="Zoom_In"/>
+    <addaction name="Zoom_Out"/>
+    <addaction name="Zoom_1_1"/>
+    <addaction name="Zoom_to_fit"/>
+    <addaction name="separator"/>
+    <addaction name="Flip"/>
+   </widget>
+   <widget class="QMenu" name="menuImage">
+    <property name="title">
+     <string>Image</string>
+    </property>
+    <addaction name="Histogram"/>
+    <addaction name="Line_Profile"/>
+    <addaction name="Measure"/>
+    <addaction name="separator"/>
+    <addaction name="Brightness"/>
+    <addaction name="Set_coordinate_system"/>
+    <addaction name="Image_mask"/>
+    <addaction name="Geometry"/>
+    <addaction name="separator"/>
+    <addaction name="Select_Pattern"/>
+    <addaction name="Chop_Pattern"/>
+   </widget>
+   <widget class="QMenu" name="menuColor">
+    <property name="title">
+     <string>Color</string>
+    </property>
+    <addaction name="Convert_To_Grayscale"/>
+    <addaction name="Color_plane_extraction"/>
+   </widget>
+   <widget class="QMenu" name="menuGrayscale">
+    <property name="title">
+     <string>Grayscale</string>
+    </property>
+    <addaction name="Adaptative_Theshold"/>
+   </widget>
+   <widget class="QMenu" name="menuBinary">
+    <property name="title">
+     <string>Binary</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuMachine_Vision">
+    <property name="title">
+     <string>Machine Vision</string>
+    </property>
+    <addaction name="Clamp"/>
+   </widget>
+   <widget class="QMenu" name="menuIdentification">
+    <property name="title">
+     <string>Identification</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuImage"/>
+   <addaction name="menuColor"/>
+   <addaction name="menuGrayscale"/>
+   <addaction name="menuBinary"/>
+   <addaction name="menuMachine_Vision"/>
+   <addaction name="menuIdentification"/>
+   <addaction name="menuTools"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="Open_Image">
+   <property name="text">
+    <string>Open Image...     Ctrl+O</string>
+   </property>
+  </action>
+  <action name="Exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="Zoom_In">
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+  </action>
+  <action name="Zoom_Out">
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+  </action>
+  <action name="Zoom_1_1">
+   <property name="text">
+    <string>Zoom 1:1</string>
+   </property>
+  </action>
+  <action name="Zoom_to_fit">
+   <property name="text">
+    <string>Zoom to fit</string>
+   </property>
+  </action>
+  <action name="Histogram">
+   <property name="text">
+    <string>Histogram</string>
+   </property>
+  </action>
+  <action name="Line_Profile">
+   <property name="text">
+    <string>Line Profile</string>
+   </property>
+  </action>
+  <action name="Measure">
+   <property name="text">
+    <string>Measure</string>
+   </property>
+  </action>
+  <action name="Brightness">
+   <property name="text">
+    <string>Brightness</string>
+   </property>
+  </action>
+  <action name="Set_coordinate_system">
+   <property name="text">
+    <string>Set coordinate system</string>
+   </property>
+  </action>
+  <action name="Image_mask">
+   <property name="text">
+    <string>Image mask</string>
+   </property>
+  </action>
+  <action name="Geometry">
+   <property name="text">
+    <string>Geometry</string>
+   </property>
+  </action>
+  <action name="Undo">
+   <property name="text">
+    <string>Undo      Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="Flip">
+   <property name="text">
+    <string>Apply Flip      Ctrl+W</string>
+   </property>
+  </action>
+  <action name="Save_Image">
+   <property name="text">
+    <string>Save Image          Ctrl+S</string>
+   </property>
+  </action>
+  <action name="Convert_To_Grayscale">
+   <property name="text">
+    <string>Convert To Grayscale      Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="Select_Pattern">
+   <property name="text">
+    <string>Select Pattern         Ctrl+P</string>
+   </property>
+  </action>
+  <action name="Adaptative_Theshold">
+   <property name="text">
+    <string>Adaptative Theshold</string>
+   </property>
+  </action>
+  <action name="Chop_Pattern">
+   <property name="text">
+    <string>Chop Pattern         Ctrl+X</string>
+   </property>
+  </action>
+  <action name="Color_plane_extraction">
+   <property name="text">
+    <string>Color Plane Extraction</string>
+   </property>
+  </action>
+  <action name="Clamp">
+   <property name="text">
+    <string>Clamp (Rake)</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -17,6 +17,14 @@ Error in black and white convertion ---> SOLVED
 Apply dilate filter
 Apply erode filter
 
+version 1.0.2 includes the fallowin features:
+
+re structure project. Add color plane extraction
+
+version 1.0.3 include:
+
+colors operations
+
 Status: Development
 
 Contact: juancruznoya@mi.unc.edu.ar
