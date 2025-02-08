@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>464</width>
-    <height>648</height>
+    <width>323</width>
+    <height>685</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,8 +33,8 @@
        <rect>
         <x>40</x>
         <y>29</y>
-        <width>221</width>
-        <height>221</height>
+        <width>241</width>
+        <height>241</height>
        </rect>
       </property>
       <property name="contextMenuPolicy">
@@ -51,8 +51,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>221</width>
-         <height>221</height>
+         <width>241</width>
+         <height>241</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="wheel_layout">
@@ -61,6 +61,150 @@
         </property>
        </layout>
       </widget>
+     </widget>
+     <widget class="QListWidget" name="operators_list">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>310</y>
+        <width>241</width>
+        <height>301</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string notr="true"/>
+       </property>
+       <property name="background">
+        <brush brushstyle="Dense7Pattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </property>
+       <property name="foreground">
+        <brush brushstyle="NoBrush">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </property>
+       <property name="flags">
+        <set>ItemIsSelectable</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Subtract</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Multiply</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Divide</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Modulo</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Absolute Difference</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="background">
+        <brush brushstyle="Dense7Pattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </property>
+       <property name="flags">
+        <set>NoItemFlags</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>And</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Not And</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Or</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Not Or</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Exclusive Or</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Not Exclusive Or</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Logical Difference</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QWidget" name="colorSample" native="true">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>275</y>
+        <width>41</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 1px solid black;</string>
+      </property>
+     </widget>
+     <widget class="QDialogButtonBox" name="buttonBox">
+      <property name="geometry">
+       <rect>
+        <x>125</x>
+        <y>630</y>
+        <width>156</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      </property>
      </widget>
     </widget>
    </item>

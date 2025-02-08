@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
+from UI.color_operators import ColorOperator
 from PyQt5.QtGui import QKeySequence
 from UI.generic_popup import Popup
 
@@ -40,6 +41,7 @@ class Main(QMainWindow):
         self.select_kernel = Popup(window_title="Select Kernel", text="Block Size", text2="C") #Creo un popup en caso de necesitarlo
         self.re_scale_popup = Popup(window_title="Select zoom", text="zoom") #Creo un popup en caso de necesitarlo
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
+        self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
         #Bar Menu actions
         
         self.canvas = CanvasWidget(self.img_conteiner) #This is the image control and is going to img_conteiner
@@ -62,6 +64,8 @@ class Main(QMainWindow):
         self.Geometry.triggered.connect(self.size_selector)
         self.Color_plane_extraction.triggered.connect(self.plane_selector)
         self.Clamp.triggered.connect(self.canvas.apply_clamp)
+        
+        self.Color_Operators.triggered.connect(self.color_operator_window)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -110,6 +114,17 @@ class Main(QMainWindow):
             if dialog.exec_() == QDialog.Accepted: #Al presionar aceptar
                 extraction, blackwhite = dialog.getValues()
                 self.canvas.apply_plane_extraction(plane=extraction,bw=blackwhite)
+            else:
+                pass
+    def color_operator_window(self):
+        if self.canvas.qt_image is not None:
+            temp_img = self.canvas.get_cv_image() #Tomo la imagen cargada
+            self.color_operator_popup.load_image(cv_image=temp_img)
+            dialog = self.color_operator_popup
+            if dialog.exec_() == QDialog.Accepted:
+                operation,color = dialog.getValues()
+                #Se debe agregar la funncion en el canva
+                
             else:
                 pass
 

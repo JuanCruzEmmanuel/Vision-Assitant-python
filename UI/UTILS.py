@@ -11,10 +11,10 @@ class ColorWheel(QWidget):
         #self.setFixedSize(300, 350)
         self.setAttribute(Qt.WA_StyledBackground, True)  # Hace que el fondo sea transparente
 
-        self.color_label = QLabel(self)
+        #self.color_label = QLabel(self)
         #self.color_label.setGeometry(50, 310, 200, 30)
-        self.color_label.setAlignment(Qt.AlignCenter)
-        self.color_label.setStyleSheet("font-size: 14px; border: 1px solid black; background-color: white;")
+        #self.color_label.setAlignment(Qt.AlignCenter)
+        #self.color_label.setStyleSheet("font-size: 14px; border: 1px solid black; background-color: white;")
 
         self.color_wheel = self.generate_color_wheel()
 
@@ -22,7 +22,7 @@ class ColorWheel(QWidget):
 
     def generate_color_wheel(self):
         """Genera una imagen con un círculo de colores y fondo transparente."""
-        size = 190
+        size = 241
         image = QImage(size, size, QImage.Format_ARGB32)
         image.fill(Qt.transparent)  # Fondo transparente
 

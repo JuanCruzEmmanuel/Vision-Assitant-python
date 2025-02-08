@@ -132,6 +132,7 @@
     </property>
     <addaction name="Convert_To_Grayscale"/>
     <addaction name="Color_plane_extraction"/>
+    <addaction name="Color_Operators"/>
    </widget>
    <widget class="QMenu" name="menuGrayscale">
     <property name="title">
@@ -280,6 +281,11 @@
   <action name="Clamp">
    <property name="text">
     <string>Clamp (Rake)</string>
+   </property>
+  </action>
+  <action name="Color_Operators">
+   <property name="text">
+    <string>Color Operators</string>
    </property>
   </action>
  </widget>
