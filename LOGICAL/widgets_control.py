@@ -244,6 +244,21 @@ class CanvasWidget(QWidget):
         
         self.update()
         
+    def apply_color_operators(self,operation,color):
+        """
+        Funcion que aplica la operacion a la imagen de trabajo
+        :operation: Operacion que se va a realizar
+        :color: tupla con formato (B,G,R)
+        """
+        
+        ##Aca podria nuevamente preguntar si existe alguna imagen, aunque creo que no es necesario
+        
+        self.processor.color_operators()
+        self.qt_image = self.processor.get_qt_image() #actualizo la imagen en formato QT
+        self.save_actions.append(("apply_color_operators",operation,color))
+        
+        self.update()
+    
     def apply_clamp(self):
         """
         Activa la flag del clamp

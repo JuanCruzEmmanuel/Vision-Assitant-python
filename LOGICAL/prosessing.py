@@ -88,7 +88,9 @@ class ImageProcessor:
     def adaptiveThreshold(self,blocksize,c):
         
         """
-        Aplica el filtro adaptativo a la imagen OCV
+        Aplica el filtro adaptativo a la imagen OCV\n
+        :blocksize: Size of a pixel neighborhood that is used to calculate a threshold value for the pixel: 3, 5, 7, and so on.\n
+        :c: Constant subtracted from the mean or weighted mean (see the details below). Normally, it is positive but may be zero or negative as well.
         """
         if self.cv_image is not None:
             try:
@@ -107,6 +109,12 @@ class ImageProcessor:
             pass
         
     def chop_patern(self):
+        """
+        En caso de cargar un patron lo puede recortar. \n
+        
+        Hay que buscar la forma que seleccionar varios patrones en simultaneo
+        """
+        
         print(self.patrones[0][1])
         patrones_coordenadas= self.patrones[0][1]
         self.cv_image = self.cv_image[patrones_coordenadas[0]:patrones_coordenadas[0]+patrones_coordenadas[1],patrones_coordenadas[2]:patrones_coordenadas[2]+patrones_coordenadas[3]].copy()
@@ -116,7 +124,9 @@ class ImageProcessor:
         self.history.append(self.cv_image.copy())
         
     def histogram(self):
-        
+        """
+        Calcula el histograma para luego mostrarlo en pantalla
+        """
         if len(self.cv_image.shape) == 2:  # blanco y negro
             hist = cv2.calcHist([self.cv_image], [0], None, [256], [0, 256])
             plt.plot(hist, color='black')
@@ -136,6 +146,10 @@ class ImageProcessor:
             plt.show()
 
     def zoom_image(self,zoom):
+        """
+        Aplica el zoom a la imagen CV\n
+        :zoom: Constante que controla el zoom, entre 1 y 6
+        """
 
         y, x= self.cv_image.shape[:2]
         self.cv_image = cv2.resize(self.cv_image,(x*zoom,y*zoom),interpolation=cv2.INTER_CUBIC)
@@ -145,7 +159,9 @@ class ImageProcessor:
     
     def plane_extraction(self,plane,bw):
         """
-        Extrae el plano a la imagen cv
+        Extrae el plano a la imagen cv\n
+        :plane: El plano que se va a extraer para trabajar\n
+        :bw: Antes se trabajaba con un boton bw, pero ahora es siempre asi
         """
         selector = plane
         b, g, r = cv2.split(self.cv_image) #separo los planos de trabajo
@@ -170,15 +186,15 @@ class ImageProcessor:
         
     def clamp(self,rect,tipe=None):
         """
-        Realiza el calculo de las distancias
-        Atributos propios del rect:
+        Realiza el calculo de las distancias\n
+        Atributos propios del rect:\n
         {
-            rect.y() (inicio del punto)
-            rect.height() (altura total, no confundir con posicion final de y (siendo esta y+height))
-            rect.x() (inicio del punto)
-            rect.width() (ancho total, no confundir con posicion final de x (siendo esta x+width))
-        }
-        img[rect.y():rect.y()+rect.height() ,rect.x() :rect.x() +rect.width() ] todos estos se deben convertir en int
+            rect.y() (inicio del punto)\n
+            rect.height() (altura total, no confundir con posicion final de y (siendo esta y+height))\n
+            rect.x() (inicio del punto)\n
+            rect.width() (ancho total, no confundir con posicion final de x (siendo esta x+width))\n
+        }\n
+        img[rect.y():rect.y()+rect.height() ,rect.x() :rect.x() +rect.width() ] todos estos se deben convertir en int\n
         
         """
         ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
@@ -188,3 +204,60 @@ class ImageProcessor:
         print(f"Punto más arriba en ROI: {topmost}")
         print(f"Punto más abajo en ROI: {bottommost}")
         
+    def color_operators(self,operation,color):
+        """
+        Aplica la operacion seleccionada a la imagen CV\n
+        :operation: Operacion seleccionada\n
+        :color: Color en formato tupla (B,G,R)\n
+        """
+        
+        R = color[2] #Obtengo las componente en rojo
+        B = color[0] #Obtengo las componente en azul
+        G = color[1] #obtengo las componente en verde
+        selector = operation #Tal vez no se vea tan elegante, pero funciona dafac :)
+
+        if selector =="Add":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.add(self.cv_image,NP_COLOR)
+        elif selector =="Subtract":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.subtract(self.cv_image,NP_COLOR)
+        elif selector =="Multiply":
+            NP_COLOR = np.array([B/255,G/255,R/255],dtype=np.float32)
+            self.cv_image = cv2.multiply(self.cv_image.astype(np.float32) ,NP_COLOR)
+        elif selector =="Divide":
+            try:
+                NP_COLOR = np.array([255/B,255/G,255/R],dtype=np.float32)
+                self.cv_image = cv2.divide(self.cv_image,NP_COLOR)
+            except:
+                self.cv_image = self.cv_image
+        elif selector =="Absolute Difference":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.absdiff(self.cv_image,NP_COLOR)
+        elif selector =="Modulo":
+            #NP_COLOR = np.array([1/B,1/G,1/R],dtype=np.uint8)
+            self.cv_image = self.cv_image % np.array([B,G,R],dtype=np.uint8)
+            
+        elif selector =="And":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_and(self.cv_image,NP_COLOR)
+        elif selector =="Not And":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_not(cv2.bitwise_and(self.cv_image,NP_COLOR))#Le aplico el not para hacer el inverso del and
+        elif selector =="Or":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_or(self.cv_image,NP_COLOR)
+        elif selector =="Not Or":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_not(cv2.bitwise_or(self.cv_image,NP_COLOR))
+        elif selector == "Exclusive Or":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_xor(self.cv_image,NP_COLOR)
+        elif selector =="Not Exclusive Or":
+            NP_COLOR = np.array([B,G,R],dtype=np.uint8)
+            self.cv_image = cv2.bitwise_not(cv2.bitwise_xor(self.cv_image,NP_COLOR))              
+        else:
+            self.cv_image = self.cv_image
+            
+        
+        self.history.append(self.cv_image.copy())

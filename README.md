@@ -21,7 +21,7 @@ version 1.0.2 includes the fallowin features:
 
 re structure project. Add color plane extraction
 
-version 1.0.3 include:
+version 1.0.3 to 1.0.5 include:
 
 colors operations
 
