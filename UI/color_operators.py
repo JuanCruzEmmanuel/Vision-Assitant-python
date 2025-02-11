@@ -115,6 +115,6 @@ class ColorOperator(QDialog):
             pass
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ima = cv2.imread(r"C:\Users\juanc\Desktop\Asistente de vision\multipar.jpeg")
+    ima = cv2.imread(r"C:\Users\juanc\Desktop\Asistente de vision\manzana.jpg")
     dialog = ColorOperator(cv_image=ima)
     dialog.exec_()

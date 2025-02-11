@@ -6,13 +6,14 @@ from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDial
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
 from UI.color_operators import ColorOperator
+from UI.color_manipulation import colorManipulation
 from PyQt5.QtGui import QKeySequence
 from UI.generic_popup import Popup
 
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
-__license__ = "GPL"
-__version__ = "1.0.5"
+__license__ = "MIT"
+__version__ = "1.0.6"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -27,6 +28,7 @@ VERSIONES
 1.0.3 se agregan funcionabilidades como cortar el patron para mas facilidades de trabajo. Se agrega la posibilidad de observar el histograma de la imagen
 1.0.4 Se agrega el plano de extraccion de colores.
 1.0.5 Se agrega La operacion de colores
+1.0.6 Se agrega manipulacion de colores en hsv
 """
 
 class Main(QMainWindow):
@@ -40,6 +42,7 @@ class Main(QMainWindow):
         self.re_scale_popup = Popup(window_title="Select zoom", text="zoom") #Creo un popup en caso de necesitarlo
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
         self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
+        self.color_manipilation_popup = colorManipulation(cv_image=None) #No le cargo imagen
         #Bar Menu actions
         
         self.canvas = CanvasWidget(self.img_conteiner) #This is the image control and is going to img_conteiner
@@ -64,6 +67,8 @@ class Main(QMainWindow):
         self.Clamp.triggered.connect(self.canvas.apply_clamp)
         
         self.Color_Operators.triggered.connect(self.color_operator_window)
+        
+        self.Color_Manipulation.triggered.connect(self.color_manipulation_control)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -125,8 +130,13 @@ class Main(QMainWindow):
                 
             else:
                 pass
-
-        
+    def color_manipilation_control(self):
+        if self.canvas.qt_image is not None:
+            temp_img = self.canvas.get_cv_image() #Tomo la imagen cargada
+            self.color_manipilation_popup.load_image(cv_image=temp_img)
+            dialog = self.color_operator_popup
+            if dialog.exec_() == QDialog.Accepted:
+                print("HACER ALGO")
         
 if __name__ =="__main__":
     app = QApplication(sys.argv)

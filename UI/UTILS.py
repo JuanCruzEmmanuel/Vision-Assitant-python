@@ -1,8 +1,9 @@
 import sys
 import math
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel,QHBoxLayout
 from PyQt5.QtGui import QPainter, QImage, QColor, QMouseEvent, QPixmap
 from PyQt5.QtCore import Qt, QPoint,pyqtSignal
+from superqt import QRangeSlider
 
 class ColorWheel(QWidget):
     colorSelected = pyqtSignal(QColor)
@@ -59,6 +60,46 @@ class ColorWheel(QWidget):
             #self.color_label.setText(html_color)
             #self.color_label.setStyleSheet(f"background-color: {html_color}; font-size: 14px; border: 1px solid black;")
 
+class RangeSliderWidget(QWidget):
+    """
+    :Para que funcione se debe instalar la libreria superqt: \n
+    Widget para controlar un slicer con rango inicial y final\n
+    :min_value: valor inicial (extremo izquierdo). Por defecto =0\n
+    :max_value: Valor final (extremo derecho). Por defecto = 255
+    """
+
+    rangedValue = pyqtSignal(tuple)
+    def __init__(self,min_value:int=0,max_value:int=255):
+        """
+        Widget para controlar un slicer con rango inicial y final\n
+        :min_value: valor inicial (extremo izquierdo). Por defecto =0\n
+        :max_value: Valor final (extremo derecho). Por defecto = 255
+        """
+        super().__init__()
+        self.label_min = QLabel(str(min_value))
+        self.label_max = QLabel(str(max_value))
+        self.slider = QRangeSlider() #Llamo al objeto de superqt
+        self.slider.setOrientation(1)  # Horizontal       
+        self.slider.setRange(min_value, max_value) #creo en funcion al tamaño que me intrese
+        self.slider.setValue((min_value, max_value))
+        self.slider.sliderReleased.connect(self.update_values) #En cambio que exista un cambio de valor
+        #self.slider.setFixedWidth(140)
+        # 🔹 Agregar layout interno
+        layout = QHBoxLayout()
+        layout.addWidget(self.label_min)
+        layout.addWidget(self.slider)
+        layout.addWidget(self.label_max)
+        self.setLayout(layout)  # 🔹 Importante: establecer layout en el widget
+
+    def update_values(self):
+        """
+        Señal que emite el valor al main
+        """
+        values = self.slider.value()
+        self.label_min.setText(str(values[0]))  # Actualiza valor izquierdo
+        self.label_max.setText(str(values[1]))  # Actualiza valor derecho
+        #print(f"Nuevo rango: {values}")  
+        self.rangedValue.emit(values) #Señal que emite los valores de cambio
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ColorWheel()
