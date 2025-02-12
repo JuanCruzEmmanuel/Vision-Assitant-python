@@ -42,7 +42,7 @@ class Main(QMainWindow):
         self.re_scale_popup = Popup(window_title="Select zoom", text="zoom") #Creo un popup en caso de necesitarlo
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
         self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
-        self.color_manipilation_popup = colorManipulation(cv_image=None) #No le cargo imagen
+        self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
         #Bar Menu actions
         
         self.canvas = CanvasWidget(self.img_conteiner) #This is the image control and is going to img_conteiner
@@ -130,11 +130,11 @@ class Main(QMainWindow):
                 
             else:
                 pass
-    def color_manipilation_control(self):
+    def color_manipulation_control(self):
         if self.canvas.qt_image is not None:
             temp_img = self.canvas.get_cv_image() #Tomo la imagen cargada
-            self.color_manipilation_popup.load_image(cv_image=temp_img)
-            dialog = self.color_operator_popup
+            self.color_manipulation_popup.load_image(cv_image=temp_img)
+            dialog = self.color_manipulation_popup
             if dialog.exec_() == QDialog.Accepted:
                 print("HACER ALGO")
         

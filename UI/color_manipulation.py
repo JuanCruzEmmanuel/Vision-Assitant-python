@@ -98,6 +98,13 @@ class colorManipulation(QDialog):
         elif self._OPERATION == "Change":
             self.change()
     
+    def load_image(self,cv_image):
+        """
+        Carga la imagen de manera externa\n
+        :cv_image: Imagen en formato cv
+        """
+        self._IMAGE = cv_image #Cargo como atributo
+    
     def substract(self):
         im_temp = self._IMAGE.copy()
         HSV_IMAGE = cv2.cvtColor(self._IMAGE,cv2.COLOR_BGR2HSV) #Cambio el plano de trabajo
