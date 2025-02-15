@@ -87,6 +87,10 @@ class colorManipulation(QDialog):
         self.operationBox.currentTextChanged.connect(self.switchCase) #Desde aca voy a usar las operaciones
         self.HUE1.addWidget(self.hue_slicer_1)
         self.HUE1.update()
+
+        #Activo los ok y cancel
+        self.buttonBox.accepted.connect(self.accept) #activo los botones OK Y CANCEL. Envia directamente la señal getValues
+        self.buttonBox.rejected.connect(self.reject)
     def switchCase(self):
         """
         No se me ocurrio otro nombre xd
@@ -202,6 +206,13 @@ class colorManipulation(QDialog):
         
         self.val4_color = value
         self.switchCase()
+
+
+    def get_value(self):
+        if self._OPERATION =="Substract":
+            return self._OPERATION,(self.hue1_color,self.sat1_color,self.val1_color),(self.hue2_color,self.sat2_color,self.val2_color)
+        else: #at moment only have 2 operations
+            return self._OPERATION,(self.R_color,self.G_color,self.B_color)
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
