@@ -253,7 +253,7 @@ class CanvasWidget(QWidget):
         
         ##Aca podria nuevamente preguntar si existe alguna imagen, aunque creo que no es necesario
         
-        self.processor.color_operators()
+        self.processor.color_operators(operation=operation,color=color)
         self.qt_image = self.processor.get_qt_image() #actualizo la imagen en formato QT
         self.save_actions.append(("apply_color_operators",operation,color))
         
@@ -264,3 +264,4 @@ class CanvasWidget(QWidget):
         Activa la flag del clamp
         """
         self._CLANP_FLAG = True
+

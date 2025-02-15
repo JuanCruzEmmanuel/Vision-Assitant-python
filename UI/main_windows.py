@@ -126,7 +126,7 @@ class Main(QMainWindow):
             dialog = self.color_operator_popup
             if dialog.exec_() == QDialog.Accepted:
                 operation,color = dialog.getValues()
-                #Se debe agregar la funncion en el canva
+                self.canvas.apply_color_operators(operation=operation,color=color)
                 
             else:
                 pass
