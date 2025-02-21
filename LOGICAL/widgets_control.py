@@ -264,4 +264,20 @@ class CanvasWidget(QWidget):
         Activa la flag del clamp
         """
         self._CLANP_FLAG = True
-
+        
+        
+    def apply_color_manipulation(self,operation,color1,color2,color_change):
+        """
+        Funcion que aplica filtrado por color y poder eliminarlo o cambiarlo\n\n\n
+        Hay que tener en consideracion que cada color tiene su valor minimo y maximo es decir\n
+        color = ((hue_min,hue_max),(sat_min,sat_max),(val_min,val_max))\n
+        :operation: puede ser substraction o change\n
+        :color1: rango de color en hsv\n
+        :color2: rango de color en hsv\n
+        :color_change: color por el cual se va a reemplazar el rango
+        """
+        self.processor.color_manipulation(operation=operation,range1=color1,range2=color2,color=color_change)
+        self.qt_image = self.processor.get_qt_image() #actualizo la imagen en formato QT
+        self.save_actions.append(("apply_color_manipulation",operation,color1,color2,color_change))
+        
+        self.update()

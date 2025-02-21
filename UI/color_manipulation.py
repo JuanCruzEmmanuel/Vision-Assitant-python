@@ -208,11 +208,11 @@ class colorManipulation(QDialog):
         self.switchCase()
 
 
-    def get_value(self):
+    def getValues(self):
         if self._OPERATION =="Substract":
-            return self._OPERATION,(self.hue1_color,self.sat1_color,self.val1_color),(self.hue2_color,self.sat2_color,self.val2_color)
+            return self._OPERATION,(self.hue1_color,self.sat1_color,self.val1_color),(self.hue2_color,self.sat2_color,self.val2_color),0
         else: #at moment only have 2 operations
-            return self._OPERATION,(self.R_color,self.G_color,self.B_color)
+            return self._OPERATION,(self.hue1_color,self.sat1_color,self.val1_color),(self.hue2_color,self.sat2_color,self.val2_color),(self.R_color,self.G_color,self.B_color)
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -136,8 +136,8 @@ class Main(QMainWindow):
             self.color_manipulation_popup.load_image(cv_image=temp_img)
             dialog = self.color_manipulation_popup
             if dialog.exec_() == QDialog.Accepted:
-                print("HACER ALGO")
-        
+                operacion,color1,color2,color_cambio = dialog.getValues() #donde color1 = rango de color 1, color2 = rango de color 2 y color_cambio = color por el cual se reemplaza
+                self.canvas.apply_color_manipulation(operation=operacion,color1=color1,color2=color2,color_change=color_cambio)
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

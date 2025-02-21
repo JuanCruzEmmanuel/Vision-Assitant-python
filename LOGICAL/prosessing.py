@@ -261,3 +261,43 @@ class ImageProcessor:
             
         
         self.history.append(self.cv_image.copy())
+        
+        
+    def color_manipulation(self,operation,range1,range2,color):
+        """
+        Modifica la imagen opencv\n
+        :operation: substraction/change\n
+        :range1: rango color 1 en hsv\n
+        :range2: 2 rango de color en hsv\n
+        :color: Color que va a reemplazar
+        """
+        #Realizo el metodo de unpack la tupla
+        HUE1,SAT1,VAL1 = range1 
+        HUE2,SAT2,VAL2 = range2
+        
+        if operation == "Substract":
+            #print("ingrese papu")
+            im_temp = self.cv_image.copy()
+            HSV_IMAGE = cv2.cvtColor(self.cv_image,cv2.COLOR_BGR2HSV) #Cambio el plano de trabajo
+
+            #para trabajar las imagenes voy a tener que usar los colores maximos y minimos
+            #(hue,sat,value)
+            low_color_1 = np.array([HUE1[0],SAT1[0],VAL1[0]])
+            high_color_1 = np.array([HUE1[1],SAT1[1],VAL1[1]])
+            mask = cv2.inRange(HSV_IMAGE, low_color_1, high_color_1)
+        
+            if HUE2[1]-HUE2[0]<100: #Totalmente arbitrario
+                low_color_2 = np.array([HUE2[0],SAT2[0],VAL2[0]])
+                high_color_2 = np.array([HUE2[1],SAT2[1],VAL2[1]])
+                mask2 = cv2.inRange(HSV_IMAGE, low_color_2, high_color_2)
+                
+                mask = cv2.bitwise_or(mask,mask2) #En caso que exista, los uno
+            
+
+            im_temp[mask > 0] = [0, 0, 0]
+            
+            self.cv_image = im_temp
+            
+            self.history.append(self.cv_image.copy())
+        elif operation =="Change":
+            R,G,B = color
