@@ -13,7 +13,7 @@ from UI.generic_popup import Popup
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -29,6 +29,7 @@ VERSIONES
 1.0.4 Se agrega el plano de extraccion de colores.
 1.0.5 Se agrega La operacion de colores
 1.0.6 Se agrega manipulacion de colores en hsv
+1.0.7 Se agrega el boton save scripts
 """
 
 class Main(QMainWindow):
@@ -69,6 +70,8 @@ class Main(QMainWindow):
         self.Color_Operators.triggered.connect(self.color_operator_window)
         
         self.Color_Manipulation.triggered.connect(self.color_manipulation_control)
+        
+        self.Save_Script.triggered.connect(self.canvas.save_scripts)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -77,7 +80,7 @@ class Main(QMainWindow):
         self.open = QShortcut(QKeySequence("Ctrl+o"), self).activated.connect(self.open_image) #Atajo seleccionar imagen
         self.pattern = QShortcut(QKeySequence("Ctrl+p"), self).activated.connect(self.open_patron) #Atajo seleccionar patron imagen
         self.chop = QShortcut(QKeySequence("Ctrl+x"), self).activated.connect(self.canvas.chop_loaded_pattern) #Atajo cortar patron
-        
+        self.shortcut_save_scripts =QShortcut(QKeySequence("Ctrl+s"), self).activated.connect(self.canvas.save_scripts) #Atajo Guardar scripts
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)

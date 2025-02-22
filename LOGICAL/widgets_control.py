@@ -23,7 +23,27 @@ class CanvasWidget(QWidget):
         self.save_actions = []
         self.GS = False
         
+    def save_scripts(self,name="data",path = None):
+        """
+        Se guardara el scripts en un primer momento formato pickle\n
+        :path: Direccion donde se guardara el scripts
+        """
+        if path==None:
+            #En caso que no se especifique se guardara en /root/
+            with open(f"{name}.pkl", "wb") as f:
+                pickle.dump(self.save_actions, f)
+                
+        else:
+            try: #En caso que ponga mal la direccion
+                with open(fr"{path}/{name}.pkl", "wb") as f: #Puede ser que el slash sea para el otro lado
+                    pickle.dump(self.save_actions, f)
+            except:
+                with open(f"{name}.pkl", "wb") as f:
+                    pickle.dump(self.save_actions, f)
         
+        print("Se ha guardado el script de manera correcta")
+        for N,ACTION in enumerate(self.save_actions):
+            print(f"Accion {N}: {ACTION[0]}")
     def load_image(self, file_name):
         self.processor.load_image(file_name) #Cargo la imagen para trabajarla como opencv
         self.qt_image = self.processor.get_qt_image()
