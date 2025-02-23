@@ -26,9 +26,9 @@
       <widget class="QFrame" name="img_conteiner">
        <property name="geometry">
         <rect>
-         <x>-10</x>
+         <x>220</x>
          <y>0</y>
-         <width>1341</width>
+         <width>1111</width>
          <height>701</height>
         </rect>
        </property>
@@ -44,9 +44,9 @@
        <widget class="QWidget" name="horizontalLayoutWidget">
         <property name="geometry">
          <rect>
-          <x>9</x>
+          <x>-1</x>
           <y>-1</y>
-          <width>1341</width>
+          <width>1351</width>
           <height>701</height>
          </rect>
         </property>
@@ -71,6 +71,81 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
+      </widget>
+      <widget class="QWidget" name="extras_widgets" native="true">
+       <property name="geometry">
+        <rect>
+         <x>-10</x>
+         <y>-1</y>
+         <width>231</width>
+         <height>701</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(232, 232, 232);</string>
+       </property>
+       <widget class="QTableWidget" name="Pattern_list">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>1</y>
+          <width>221</width>
+          <height>241</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(232, 232, 232);
+border-color: rgb(85, 255, 0);</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <property name="gridStyle">
+         <enum>Qt::DashDotLine</enum>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>NOMBRE</string>
+         </property>
+         <property name="background">
+          <color>
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>COORD</string>
+         </property>
+         <property name="background">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+        </column>
+       </widget>
       </widget>
      </widget>
     </item>

@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QWidget, QInputDialog,QDialog,QVBoxLayout, QSpinBox, QLabel, QDialogButtonBox,QDoubleSpinBox
 from PyQt5.QtGui import QPainter, QPen, QColor
-from PyQt5.QtCore import Qt, QRect, QPoint
+from PyQt5.QtCore import Qt, QRect, QPoint,pyqtSignal
 from LOGICAL.prosessing import ImageProcessor
 import pickle
 
 class CanvasWidget(QWidget):
+    patrones_lista = pyqtSignal(list)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.processor = ImageProcessor()
@@ -13,6 +14,7 @@ class CanvasWidget(QWidget):
         self.end_point = None
         self.rectangles = []  # Lista de tuplas (QRect, etiqueta, color)
         self.patrones = []
+        self.patrones_PATH  = [] #Para guardar los path por seguridad
         self.scale_factor = 1.0  # Factor de escala inicial
         self.translation = QPoint(0, 0)  # Para el desplazamiento
         self.last_mouse_pos = None  # Para seguimiento del movimiento del ratón
@@ -182,10 +184,12 @@ class CanvasWidget(QWidget):
         Se encarga de recuadrar una imagen patron
         """
         if self.processor.cv_image is not None:
+            self.patrones_PATH.append(path) #En caso que se realicen acciones con los patrones, se debe poder re actualizar
             y,h,x,w = self.processor.PATRON(path)
             rect = QRect(x,y,w,h)
             #print(rect)
             self.patrones.append((rect,"Patron"))
+            self.patrones_lista.emit(self.patrones)
             self.save_actions.append(("load_patern", path))
             self.update()
             
@@ -216,6 +220,15 @@ class CanvasWidget(QWidget):
                 self.save_actions.append(("chop_loaded_pattern",self.processor.patrones[0][1])) #Esto lo mejor es de alguna forma seleccionarlo por el nombre
                 self.patrones = [] #Este detallo va a llevar tiempo mejorarlo, pero no es conveniente eliminarlo...
                 self.update()
+                
+        copia_paths = self.patrones_PATH.copy() #Importante el copy esto lo que hace es copiar la informacion pero no los cambios que se realicen al original, sino quedan enlazados
+        for path in copia_paths:
+            print(path)
+            self.patrones=[]
+            try:
+                self.select_pattern(path=path)
+            except:
+                print("No se ha encontrado el patron")
                 
     def view_hisogram(self):
         if self.processor.cv_image is not None: # No se ejecuta en caso que no haya imagen cargada

@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog
+from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
 from UI.color_operators import ColorOperator
@@ -81,6 +81,10 @@ class Main(QMainWindow):
         self.pattern = QShortcut(QKeySequence("Ctrl+p"), self).activated.connect(self.open_patron) #Atajo seleccionar patron imagen
         self.chop = QShortcut(QKeySequence("Ctrl+x"), self).activated.connect(self.canvas.chop_loaded_pattern) #Atajo cortar patron
         self.shortcut_save_scripts =QShortcut(QKeySequence("Ctrl+s"), self).activated.connect(self.canvas.save_scripts) #Atajo Guardar scripts
+        
+        #Señales
+        
+        self.canvas.patrones_lista.connect(self.update_lista_patrones)        
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
@@ -141,6 +145,14 @@ class Main(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 operacion,color1,color2,color_cambio = dialog.getValues() #donde color1 = rango de color 1, color2 = rango de color 2 y color_cambio = color por el cual se reemplaza
                 self.canvas.apply_color_manipulation(operation=operacion,color1=color1,color2=color2,color_change=color_cambio)
+                
+    def update_lista_patrones(self,lista_patrones):
+
+        self.Pattern_list.setRowCount(len(lista_patrones))
+        for row, values in enumerate(lista_patrones):
+            coord = f"({values[0].x()},{values[0].width()}),({values[0].y()},{values[0].height()})" #(x0,x1),(y0,y1)
+            self.Pattern_list.setItem(row, 0, QTableWidgetItem(str(values[1])))
+            self.Pattern_list.setItem(row, 1, QTableWidgetItem(coord))
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
