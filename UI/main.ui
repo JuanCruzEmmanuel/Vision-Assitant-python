@@ -146,6 +146,19 @@ border-color: rgb(85, 255, 0);</string>
          </property>
         </column>
        </widget>
+       <widget class="QPushButton" name="Delete_pattern">
+        <property name="geometry">
+         <rect>
+          <x>134</x>
+          <y>250</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>DELETE PATTERN</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>

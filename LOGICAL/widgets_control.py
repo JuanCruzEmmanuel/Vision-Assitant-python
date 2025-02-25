@@ -25,6 +25,22 @@ class CanvasWidget(QWidget):
         self.save_actions = []
         self.GS = False
         
+    def get_patern_list(self):
+        
+        """
+        Devuelve la lista de patrones
+        """   
+        
+        return self.patrones, self.patrones_PATH
+    
+    def set_patrones_list(self,patrones,patrones_path):
+        """
+        Carga la lista de los patrones
+        """
+        
+        self.patrones = patrones
+        self.patrones_PATH = patrones_path
+        self.update() #Actualizo los eventos
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n
@@ -178,7 +194,7 @@ class CanvasWidget(QWidget):
             self.save_actions.pop()
             self.update()
             
-    def select_pattern(self,path):
+    def select_pattern(self,path,name="Patron"):
         
         """
         Se encarga de recuadrar una imagen patron
@@ -188,9 +204,9 @@ class CanvasWidget(QWidget):
             y,h,x,w = self.processor.PATRON(path)
             rect = QRect(x,y,w,h)
             #print(rect)
-            self.patrones.append((rect,"Patron"))
+            self.patrones.append((rect,name))
             self.patrones_lista.emit(self.patrones)
-            self.save_actions.append(("load_patern", path))
+            self.save_actions.append(("load_patern", path, name))
             self.update()
             
     def apply_threshold_filter(self,kernel,c):

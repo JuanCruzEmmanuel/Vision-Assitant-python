@@ -7,6 +7,7 @@ from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
 from UI.color_operators import ColorOperator
 from UI.color_manipulation import colorManipulation
+from UI.Select_patern import selectPattern
 from PyQt5.QtGui import QKeySequence
 from UI.generic_popup import Popup
 
@@ -72,6 +73,8 @@ class Main(QMainWindow):
         self.Color_Manipulation.triggered.connect(self.color_manipulation_control)
         
         self.Save_Script.triggered.connect(self.canvas.save_scripts)
+        
+        self.Delete_pattern.clicked.connect(self.delete_patron)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -91,12 +94,17 @@ class Main(QMainWindow):
         if file_name: # this is full path                                
             self.canvas.load_image(file_name) # This charge the img in memory
             
-    def open_patron(self):
+    """def open_patron(self):
         options = QFileDialog.Options()
         path, _ = QFileDialog.getOpenFileName(self,"Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
         if path:
-            self.canvas.select_pattern(path)
-            
+            self.canvas.select_pattern(path)"""
+    def open_patron(self):
+        dialog = selectPattern()
+        if dialog.exec_() == QDialog.Accepted:
+            nombre_patron,path = dialog.getValues()
+            if path:
+                self.canvas.select_pattern(path=path,name=nombre_patron)
     def kernel_selector(self):
         if self.canvas.GS:
             dialog = self.select_kernel
@@ -153,6 +161,22 @@ class Main(QMainWindow):
             coord = f"({values[0].x()},{values[0].width()}),({values[0].y()},{values[0].height()})" #(x0,x1),(y0,y1)
             self.Pattern_list.setItem(row, 0, QTableWidgetItem(str(values[1])))
             self.Pattern_list.setItem(row, 1, QTableWidgetItem(coord))
+            
+    def delete_patron(self):
+        fila_seleccionada = self.Pattern_list.currentRow()
+        nombre_patron = self.Pattern_list.item(fila_seleccionada, 0).text()
+        PATRON_LISTA,PATRON_PATH = self.canvas.get_patern_list()
+        _patron_ = [] #aux
+        _patron_path = [] #aux
+        for i,p in enumerate(PATRON_LISTA):
+            if p[1]!=nombre_patron:
+                _patron_.append(p)
+                _patron_path.append(PATRON_PATH[i]) #La mejor forma que vi de resolver esto
+            else:
+                print(f"Se ha eliminado el patron {p}")
+                
+        self.canvas.set_patrones_list(patrones=_patron_,patrones_path=_patron_path)
+        self.update_lista_patrones(lista_patrones=_patron_)
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
