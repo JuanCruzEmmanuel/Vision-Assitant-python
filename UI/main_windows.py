@@ -163,17 +163,23 @@ class Main(QMainWindow):
             self.Pattern_list.setItem(row, 1, QTableWidgetItem(coord))
             
     def delete_patron(self):
-        fila_seleccionada = self.Pattern_list.currentRow()
-        nombre_patron = self.Pattern_list.item(fila_seleccionada, 0).text()
+        try:
+            fila_seleccionada = self.Pattern_list.currentRow()
+            nombre_patron = self.Pattern_list.item(fila_seleccionada, 0).text()
+        except:
+            print("No selecciono ninguna fila a eliminar")
         PATRON_LISTA,PATRON_PATH = self.canvas.get_patern_list()
         _patron_ = [] #aux
         _patron_path = [] #aux
-        for i,p in enumerate(PATRON_LISTA):
-            if p[1]!=nombre_patron:
-                _patron_.append(p)
-                _patron_path.append(PATRON_PATH[i]) #La mejor forma que vi de resolver esto
-            else:
-                print(f"Se ha eliminado el patron {p}")
+        try:
+            for i,p in enumerate(PATRON_LISTA):
+                if p[1]!=nombre_patron:
+                    _patron_.append(p)
+                    _patron_path.append(PATRON_PATH[i]) #La mejor forma que vi de resolver esto
+                else:
+                    print(f"Se ha eliminado el patron {p}")
+        except:
+            pass
                 
         self.canvas.set_patrones_list(patrones=_patron_,patrones_path=_patron_path)
         self.update_lista_patrones(lista_patrones=_patron_)
