@@ -181,6 +181,12 @@ border-color: rgb(85, 255, 0);</string>
     <addaction name="Exit"/>
     <addaction name="Save_Image"/>
     <addaction name="Save_Script"/>
+    <addaction name="separator"/>
+    <addaction name="Select_source_folder"/>
+    <addaction name="Select_destination_folder"/>
+    <addaction name="separator"/>
+    <addaction name="Apply_script"/>
+    <addaction name="Apply_multiple"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -386,6 +392,26 @@ border-color: rgb(85, 255, 0);</string>
   <action name="Save_Script">
    <property name="text">
     <string>Save Script           Ctrl+S</string>
+   </property>
+  </action>
+  <action name="Select_source_folder">
+   <property name="text">
+    <string>Select Source Folder</string>
+   </property>
+  </action>
+  <action name="Select_destination_folder">
+   <property name="text">
+    <string>Select Destination Folder</string>
+   </property>
+  </action>
+  <action name="Apply_script">
+   <property name="text">
+    <string>Apply Script</string>
+   </property>
+  </action>
+  <action name="Apply_multiple">
+   <property name="text">
+    <string>Apply Folder Script</string>
    </property>
   </action>
  </widget>

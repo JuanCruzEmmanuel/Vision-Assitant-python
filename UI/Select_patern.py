@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog,QFileDialog,QApplication
 
 class selectPattern(QDialog):
+
     def __init__(self):
         super().__init__()
         uic.loadUi("UI/select_patern.ui",self)
@@ -17,6 +18,8 @@ class selectPattern(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         
     def select_path(self):
+        
+
         options = QFileDialog.Options()
         path, _ = QFileDialog.getOpenFileName(self,"Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
         

@@ -75,6 +75,12 @@ class Main(QMainWindow):
         self.Save_Script.triggered.connect(self.canvas.save_scripts)
         
         self.Delete_pattern.clicked.connect(self.delete_patron)
+        
+        self.Select_source_folder.triggered.connect(self.select_folder)
+        
+        self.Select_destination_folder.triggered.connect(self.select_destination)
+        
+        self.Apply_multiple.triggered.connect(self.apply_multiple_imagen)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -183,6 +189,24 @@ class Main(QMainWindow):
                 
         self.canvas.set_patrones_list(patrones=_patron_,patrones_path=_patron_path)
         self.update_lista_patrones(lista_patrones=_patron_)
+        
+    def select_folder(self):
+        options = QFileDialog.Options()
+        folder = QFileDialog.getExistingDirectory(self, "Select Folder", "", options=options)
+        self.canvas.SOURCE_FOLDER = folder #selecciona la carpeta para aplicar scripts multiples
+
+
+    def select_destination(self):
+        options = QFileDialog.Options()
+        folder = QFileDialog.getExistingDirectory(self, "Select Folder", "", options=options)
+        self.canvas.DESTINATION_FOLDER = folder #folder destino
+        
+    def apply_multiple_imagen(self):
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select from Files", "", "File (*pkl)", options=options)
+        self.canvas.scrip_path=file_name
+        self.canvas.apply_filter_many_times()
+
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

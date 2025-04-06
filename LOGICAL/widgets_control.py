@@ -3,6 +3,8 @@ from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt, QRect, QPoint,pyqtSignal
 from LOGICAL.prosessing import ImageProcessor
 import pickle
+import sys
+import os
 
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
@@ -24,6 +26,9 @@ class CanvasWidget(QWidget):
         self.ejes_ = False
         self.save_actions = []
         self.GS = False
+        self.SOURCE_FOLDER = None
+        self.DESTINATION_FOLDER = None
+        self.scrip_path = None
         
     def get_patern_list(self):
         
@@ -330,3 +335,68 @@ class CanvasWidget(QWidget):
         self.save_actions.append(("apply_color_manipulation",operation,color1,color2,color_change))
         
         self.update()
+        
+        
+    def apply_filter_many_times(self,debug=True):
+        PATRONES = []
+        import cv2
+        if self.SOURCE_FOLDER !=None:
+            if self.scrip_path != None:
+                with open(self.scrip_path, 'rb') as f:
+                    FILTER_PROCESS = pickle.load(f)
+                image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff')
+
+                for filename in os.listdir(self.SOURCE_FOLDER):
+                    if filename.lower().endswith(image_extensions):
+                        image_path = os.path.join(self.SOURCE_FOLDER, filename)
+                        if debug==True:
+                            img = cv2.imread(image_path)
+                            print(f"Procesando: {image_path}")
+                        for process in FILTER_PROCESS:
+                            if process[0]=="load_image":
+                                pass #Ya que no lo necesito en este caso, porque selecciona las imagenes del folder
+                            
+                            elif process[0]=="apply_grayscale":
+                                img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) #Blanco y negro
+                                
+                            elif process[0]=="apply_flip":
+                                img = cv2.rotate(img,cv2.ROTATE_180) #Flip 180°
+                                
+                            elif process[0]=="load_patern":
+                                
+                                PATRON = cv2.imread(process[1],0) #process[1] = path
+                                FIG = img.copy()
+                                METODO = cv2.TM_CCOEFF_NORMED
+                                coincidencias = cv2.matchTemplate(cv2.cvtColor(FIG, cv2.COLOR_BGR2GRAY), PATRON, METODO)
+                                _, max_val, _, max_loc = cv2.minMaxLoc(coincidencias)
+                                if max_val != 0.0:
+                                    # Obtén las dimensiones del patrón
+                                    ancho_patron, alto_patron = PATRON.shape[::-1]
+                                    punto_inicio = max_loc
+
+                                    PATRONES.append(((punto_inicio[1],alto_patron, punto_inicio[0],ancho_patron),process[2])) #y,h,x,w; process[2]=nombre
+                            elif process[0]=="apply_threshold_filter":
+                                img = cv2.adaptiveThreshold(img,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                        cv2.THRESH_BINARY,process[1],process[2]) #process[1]=kernel,process[2]=c
+                            elif process[0]=="chop_loaded_pattern":
+                                patrones_coordenadas= PATRONES[0][0] #En este caso solo va a cortar el patron que se encuentre en la posicion 0
+                                img = img[patrones_coordenadas[0]:patrones_coordenadas[0]+patrones_coordenadas[1],patrones_coordenadas[2]:patrones_coordenadas[2]+patrones_coordenadas[3]].copy()
+
+                            elif process[0]=="apply_zoom":
+                                y, x= img.shape[:2]
+                                img = cv2.resize(img,(x*process[1],y*process[1]),interpolation=cv2.INTER_CUBIC) #process[1] = zoom
+                            elif process[0]=="apply_plane_extraction":
+                                pass
+                            elif process[0]=="apply_color_operators":
+                                pass
+                            elif process[0]=="apply_zapply_color_manipulationoom":
+                                pass
+                        #loop de procesos, se debe guardar la imagen en el path
+                        filename = f"{filename}_editado.jpeg"
+                        if debug ==True:
+                            print(f"Se guardo en {filename}")
+                        path_guardado = os.path.join(self.DESTINATION_FOLDER, filename)
+                        
+                        cv2.imwrite(path_guardado,img)
+            #Termina el loop de imagenes
+                
