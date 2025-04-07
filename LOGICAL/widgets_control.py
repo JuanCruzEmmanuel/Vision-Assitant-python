@@ -5,6 +5,7 @@ from LOGICAL.prosessing import ImageProcessor
 import pickle
 import sys
 import os
+import json
 
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
@@ -338,6 +339,7 @@ class CanvasWidget(QWidget):
         
         
     def apply_filter_many_times(self,debug=True):
+        N=0
         PATRONES = []
         import cv2
         if self.SOURCE_FOLDER !=None:
@@ -347,10 +349,18 @@ class CanvasWidget(QWidget):
                 image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff')
 
                 for filename in os.listdir(self.SOURCE_FOLDER):
+                    sumary = {} #Para crear un dic a exportar
                     if filename.lower().endswith(image_extensions):
                         image_path = os.path.join(self.SOURCE_FOLDER, filename)
+                        img = cv2.imread(image_path)
+                        height, widht= img.shape[:2]
+                        sumary["vanilla image"] = {
+                            "Name":image_path,
+                            "Height":height,
+                            "Widht":widht
+                        }
                         if debug==True:
-                            img = cv2.imread(image_path)
+
                             print(f"Procesando: {image_path}")
                         for process in FILTER_PROCESS:
                             if process[0]=="load_image":
@@ -363,28 +373,52 @@ class CanvasWidget(QWidget):
                                 img = cv2.rotate(img,cv2.ROTATE_180) #Flip 180°
                                 
                             elif process[0]=="load_patern":
-                                
+                                matches = False
                                 PATRON = cv2.imread(process[1],0) #process[1] = path
                                 FIG = img.copy()
                                 METODO = cv2.TM_CCOEFF_NORMED
                                 coincidencias = cv2.matchTemplate(cv2.cvtColor(FIG, cv2.COLOR_BGR2GRAY), PATRON, METODO)
                                 _, max_val, _, max_loc = cv2.minMaxLoc(coincidencias)
                                 if max_val != 0.0:
+                                    matches = True
                                     # Obtén las dimensiones del patrón
                                     ancho_patron, alto_patron = PATRON.shape[::-1]
                                     punto_inicio = max_loc
-
                                     PATRONES.append(((punto_inicio[1],alto_patron, punto_inicio[0],ancho_patron),process[2])) #y,h,x,w; process[2]=nombre
+                                sumary[f"Pattern loaded {N}"]={
+                                    "Name":process[2],
+                                    "Path":process[1],
+                                    "Y":punto_inicio[1],
+                                    "Height":alto_patron,
+                                    "X":punto_inicio[0],
+                                    "Widht":ancho_patron,
+                                    "Match":matches
+                                }
+                                N+=1
                             elif process[0]=="apply_threshold_filter":
                                 img = cv2.adaptiveThreshold(img,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                                         cv2.THRESH_BINARY,process[1],process[2]) #process[1]=kernel,process[2]=c
+                                sumary["Threshold Filter"] = {
+                                    "Type":"cv2.ADAPTIVE_THRESH_GAUSSIAN_C",
+                                    "Kernel" : process[1],
+                                    "C" : process[2]
+                                }
                             elif process[0]=="chop_loaded_pattern":
                                 patrones_coordenadas= PATRONES[0][0] #En este caso solo va a cortar el patron que se encuentre en la posicion 0
                                 img = img[patrones_coordenadas[0]:patrones_coordenadas[0]+patrones_coordenadas[1],patrones_coordenadas[2]:patrones_coordenadas[2]+patrones_coordenadas[3]].copy()
-
+                                sumary["Choped"] = {
+                                    "Chop" :"Yes",
+                                    "Name":"ID"
+                                }
                             elif process[0]=="apply_zoom":
                                 y, x= img.shape[:2]
                                 img = cv2.resize(img,(x*process[1],y*process[1]),interpolation=cv2.INTER_CUBIC) #process[1] = zoom
+                                sumary["Zoom"] = {
+                                    "Y":y,
+                                    "X":x,
+                                    "Zoom":process[1],
+                                    "Type":"cv2.INTER_CUBIC"
+                                }
                             elif process[0]=="apply_plane_extraction":
                                 pass
                             elif process[0]=="apply_color_operators":
@@ -392,11 +426,14 @@ class CanvasWidget(QWidget):
                             elif process[0]=="apply_zapply_color_manipulationoom":
                                 pass
                         #loop de procesos, se debe guardar la imagen en el path
-                        filename = f"{filename}_editado.jpeg"
+                        filename = f"editado_{filename}"
+                        sumary_file = f"sumary_{filename}.json"
                         if debug ==True:
                             print(f"Se guardo en {filename}")
                         path_guardado = os.path.join(self.DESTINATION_FOLDER, filename)
-                        
+                        path_guardado_sumary = os.path.join(self.DESTINATION_FOLDER, sumary_file)
                         cv2.imwrite(path_guardado,img)
+                        with open(path_guardado_sumary,"w") as sumary_file:
+                            json.dump(sumary,sumary_file,ensure_ascii=False, indent=4)
             #Termina el loop de imagenes
                 
