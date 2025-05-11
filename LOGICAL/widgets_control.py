@@ -6,6 +6,23 @@ import pickle
 import sys
 import os
 import json
+import cv2
+
+class logger:
+    def __init__ (self,text=None,debug=True):
+        self.text = text
+        self.debug = debug
+    def set_text(self,text):
+        self.text = text
+    def printer(self):
+        if self.text!=None:
+            if self.debug:
+                print(self.text)
+            else:
+                pass
+        else:
+            pass
+        
 
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
@@ -341,8 +358,7 @@ class CanvasWidget(QWidget):
     def apply_filter_many_times(self,debug=True):
         N=0
         PATRONES = []
-        import cv2
-        if self.SOURCE_FOLDER !=None:
+        if self.SOURCE_FOLDER !=None: #En caso que no haya source no hace nada
             if self.scrip_path != None:
                 with open(self.scrip_path, 'rb') as f:
                     FILTER_PROCESS = pickle.load(f)
@@ -436,4 +452,66 @@ class CanvasWidget(QWidget):
                         with open(path_guardado_sumary,"w") as sumary_file:
                             json.dump(sumary,sumary_file,ensure_ascii=False, indent=4)
             #Termina el loop de imagenes
-                
+    def apply_script_and_continue_editing(self,debug=True):
+        log = logger(debug=debug)
+        if self.qt_image != None: #Es importante tener cargado la imagen donde se va a aplicar el filtro
+            log.set_text(text="ingreso 1")
+            log.printer()
+            if self.scrip_path != None:
+                log.set_text(text="El path del script es distinto de vacio")
+                log.printer()
+                with open(self.scrip_path, 'rb') as f:
+                    FILTER_PROCESS_FULL = pickle.load(f)
+                    log.set_text(text="Se cargo correctamente el path")
+                    log.printer()
+                for FILTER_PROCESS in FILTER_PROCESS_FULL:
+                    try:
+                        if FILTER_PROCESS[0]=="load_image":
+                            pass
+                            #self.load_image(file_name=FILTER_PROCESS[1])
+                        elif FILTER_PROCESS[0]=="load_patern":
+                            self.select_pattern(path=FILTER_PROCESS[1],name=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se cargo el patron con el nombre {FILTER_PROCESS[2]}")
+                            log.printer()
+                        elif FILTER_PROCESS[0]=="chop_loaded_pattern":
+                            self.chop_loaded_pattern()
+                            log.set_text(text="Se ha recortado el patron")
+                            log.printer()
+                        elif FILTER_PROCESS[0]=="apply_zoom":
+                            self.apply_zoom(zoom=FILTER_PROCESS[1])
+                            log.set_text(text="Se ha aplicado zoom")
+                            log.printer()
+                        elif FILTER_PROCESS[0] =="apply_grayscale":
+                            self.apply_grayscale()
+                            
+                            log.set_text(text="Se ha aplicado escala de grises")
+                            log.printer()
+                        elif FILTER_PROCESS[0] =="apply_flip":
+                            self.apply_flip()
+                            log.set_text(text="Se ha rotado La imagen")
+                            log.printer()
+                        elif FILTER_PROCESS[0] =="apply_threshold_filter":
+                            self.apply_threshold_filter(kernel=FILTER_PROCESS[1],c=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se a aplicado el filtro de umbralizado con un kernel de {FILTER_PROCESS[1]} y una matriz c de {FILTER_PROCESS[2]}")
+                            log.printer()
+                        elif FILTER_PROCESS[0] == "apply_color_manipulation":
+                            self.apply_color_manipulation(operation=FILTER_PROCESS[1],color1=FILTER_PROCESS[2],color2=FILTER_PROCESS[3],color_change=FILTER_PROCESS[4])
+                            log.set_text(text="Se aplica manipulacion de colores")
+                            log.printer()
+                        elif FILTER_PROCESS[0] =="apply_color_operators":      
+                            self.apply_color_operators(operation=FILTER_PROCESS[1],color=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica operacion de colores")
+                            log.printer()
+                        elif FILTER_PROCESS[0]=="apply_plane_extraction":
+                            self.apply_plane_extraction(plane=FILTER_PROCESS[1],bw=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica extraccion de plano de color")
+                            log.printer()
+                        else:
+                            log.set_text(text="No ha funcionado")
+                            log.printer()
+                            pass
+                            
+                    except:
+                        pass
+                log.set_text(text="Se ha finalizado")
+                log.printer()

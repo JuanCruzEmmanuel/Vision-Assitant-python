@@ -81,6 +81,8 @@ class Main(QMainWindow):
         self.Select_destination_folder.triggered.connect(self.select_destination)
         
         self.Apply_multiple.triggered.connect(self.apply_multiple_imagen)
+        
+        self.Apply_script.triggered.connect(self.apply_script)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -214,7 +216,16 @@ class Main(QMainWindow):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select from Files", "", "File (*pkl)", options=options)
         self.canvas.scrip_path=file_name
-        self.canvas.apply_filter_many_times()
+        self.canvas.apply_filter_many_times(debug=True)
+        
+    def apply_script(self):
+        """
+        Aplica el script a una imagen especifica. Se debe poder seguir actualizando la misma
+        """
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select from Files", "", "File (*pkl)", options=options)
+        self.canvas.scrip_path=file_name
+        self.canvas.apply_script_and_continue_editing(debug=True)
 
 if __name__ =="__main__":
     app = QApplication(sys.argv)
