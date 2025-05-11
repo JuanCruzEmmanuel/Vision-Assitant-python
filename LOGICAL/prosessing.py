@@ -208,9 +208,14 @@ class ImageProcessor:
         try:
             ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
             read =self.ocr.readtext(ROI)
-            
+            TEXTO = ""
             for (bbox, text, prob) in read:
                 print(f'Texto: {text}, Confianza: {prob:.2f}')
+                if TEXTO == "":
+                    TEXTO = text
+                else:
+                    TEXTO +=" "+text
+            return TEXTO
         except:
             print("ERROR")
     def color_operators(self,operation,color):

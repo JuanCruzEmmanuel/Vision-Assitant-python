@@ -97,7 +97,11 @@ class Main(QMainWindow):
         
         #Señales
         
-        self.canvas.patrones_lista.connect(self.update_lista_patrones)        
+        self.canvas.patrones_lista.connect(self.update_lista_patrones)
+        self.canvas.ocr_lista.connect(self.update_lista_ocr)
+        
+        #Updates
+        self.ocr_table.clicked.connect(self.ocr_text)
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
@@ -234,6 +238,26 @@ class Main(QMainWindow):
         Activa el flag ocr
         """
         self.canvas.apply_ocr()
+
+    def update_lista_ocr(self,ocr_lista):
+
+        self.ocr_table.setRowCount(len(ocr_lista))
+        for row, values in enumerate(ocr_lista):
+            coord = f"({values[1].x()},{values[1].width()}),({values[1].y()},{values[1].height()})" #(x0,x1),(y0,y1)
+            self.ocr_table.setItem(row, 0, QTableWidgetItem(str(values[0])))
+            self.ocr_table.setItem(row, 1, QTableWidgetItem(coord))
+            self.ocr_table.setItem(row, 2, QTableWidgetItem(str(values[2])))
+
+    def ocr_text(self):
+        currentRow = self.ocr_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.ocr_table.item(currentRow, col).text()
+            for col in range(self.ocr_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        #print(rowValue)
+        self.OCR_TEXT.setText(rowValue[2])
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

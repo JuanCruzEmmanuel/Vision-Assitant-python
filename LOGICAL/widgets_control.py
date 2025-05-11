@@ -26,6 +26,7 @@ class logger:
 
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
+    ocr_lista = pyqtSignal(list)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.processor = ImageProcessor()
@@ -48,7 +49,7 @@ class CanvasWidget(QWidget):
         self.DESTINATION_FOLDER = None
         self.scrip_path = None
         self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
-        
+        self.OCR_LIST = []
     def get_patern_list(self):
         
         """
@@ -168,9 +169,17 @@ class CanvasWidget(QWidget):
                 
             if self.OCR_FLAG:
                 self.CLAMP_FLAG =False #Para evitar conflictos con la deteccion de picos, desactivo la bandera
-                print("OCR")
-                self.processor.OCR(rect=rect)
+                #print("OCR")
+                text = self.processor.OCR(rect=rect)
                 self.OCR_FLAG=False
+                if self.OCR_LIST ==[]:
+                    N=0
+                else:
+                    N = len(self.OCR_LIST)
+                nombre_ocr = f"OCR_{N}"
+                
+                self.OCR_LIST.append((nombre_ocr,rect,text))
+                self.ocr_lista.emit(self.OCR_LIST)
             # Obtener la etiqueta del usuario
             #label, ok = QInputDialog.getText(self, "Etiqueta", "Ingrese la etiqueta:")
             #if ok and label:
@@ -343,13 +352,13 @@ class CanvasWidget(QWidget):
         """
         Activa la flag del clamp
         """
-        self.CLAMP_FLAG = True
+        self.CLAMP_FLAG = not self.CLAMP_FLAG
         
     def apply_ocr(self):
         """
         Aplica el control del ocr
         """
-        self.OCR_FLAG = True
+        self.OCR_FLAG = not self.OCR_FLAG
         
         
     def apply_color_manipulation(self,operation,color1,color2,color_change):
