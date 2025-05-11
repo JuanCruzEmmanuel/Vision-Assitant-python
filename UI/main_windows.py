@@ -191,17 +191,26 @@ class Main(QMainWindow):
         self.update_lista_patrones(lista_patrones=_patron_)
         
     def select_folder(self):
+        """
+        Selecciona la **carpeta con las imagenes target**
+        """
         options = QFileDialog.Options()
         folder = QFileDialog.getExistingDirectory(self, "Select Folder", "", options=options)
         self.canvas.SOURCE_FOLDER = folder #selecciona la carpeta para aplicar scripts multiples
 
 
     def select_destination(self):
+        """
+        Selecciona la carpeta donde se **guardarn las imagenes editadas** ademas de sus datos... \n
+        """
         options = QFileDialog.Options()
         folder = QFileDialog.getExistingDirectory(self, "Select Folder", "", options=options)
         self.canvas.DESTINATION_FOLDER = folder #folder destino
         
     def apply_multiple_imagen(self):
+        """
+        Funcion que aplica el patron a multiples imagenes, se debe tener seleccionado la **ruta de imagen** y el la **carpeta de aplicacion**\n
+        """
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select from Files", "", "File (*pkl)", options=options)
         self.canvas.scrip_path=file_name
