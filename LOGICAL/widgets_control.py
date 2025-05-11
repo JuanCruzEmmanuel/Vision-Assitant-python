@@ -39,7 +39,7 @@ class CanvasWidget(QWidget):
         self.translation = QPoint(0, 0)  # Para el desplazamiento
         self.last_mouse_pos = None  # Para seguimiento del movimiento del ratón
         self.patron = False
-        self._CLANP_FLAG = False #Controla la señal de CLAMP
+        self.CLAMP_FLAG = False #Controla la señal de CLAMP
         self._CLAMP_HISTORY = [] #Guardo los clamps que se realicen
         self.ejes_ = False
         self.save_actions = []
@@ -47,6 +47,7 @@ class CanvasWidget(QWidget):
         self.SOURCE_FOLDER = None
         self.DESTINATION_FOLDER = None
         self.scrip_path = None
+        self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
         
     def get_patern_list(self):
         
@@ -158,11 +159,18 @@ class CanvasWidget(QWidget):
                     self.patrones.append((rect,nombre_patron))
 
                     self.patron = False
-            if self._CLANP_FLAG:
+            if self.CLAMP_FLAG:
+                self.OCR_FLAG =False #Para evitar conflictos con el OCR es mejor apagar el flag
                 print("generic_name")
                 #print(rect)
                 self.processor.clamp(rect=rect)
-
+                self.CLANP_FLAG=False
+                
+            if self.OCR_FLAG:
+                self.CLAMP_FLAG =False #Para evitar conflictos con la deteccion de picos, desactivo la bandera
+                print("OCR")
+                self.processor.OCR(rect=rect)
+                self.OCR_FLAG=False
             # Obtener la etiqueta del usuario
             #label, ok = QInputDialog.getText(self, "Etiqueta", "Ingrese la etiqueta:")
             #if ok and label:
@@ -335,7 +343,13 @@ class CanvasWidget(QWidget):
         """
         Activa la flag del clamp
         """
-        self._CLANP_FLAG = True
+        self.CLAMP_FLAG = True
+        
+    def apply_ocr(self):
+        """
+        Aplica el control del ocr
+        """
+        self.OCR_FLAG = True
         
         
     def apply_color_manipulation(self,operation,color1,color2,color_change):

@@ -83,6 +83,8 @@ class Main(QMainWindow):
         self.Apply_multiple.triggered.connect(self.apply_multiple_imagen)
         
         self.Apply_script.triggered.connect(self.apply_script)
+        
+        self.OCR_butt.triggered.connect(self.apply_ocr)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -227,6 +229,11 @@ class Main(QMainWindow):
         self.canvas.scrip_path=file_name
         self.canvas.apply_script_and_continue_editing(debug=True)
 
+    def apply_ocr(self):
+        """
+        Activa el flag ocr
+        """
+        self.canvas.apply_ocr()
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

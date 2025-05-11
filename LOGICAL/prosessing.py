@@ -2,7 +2,7 @@ import cv2,os
 import numpy as np
 from PyQt5.QtGui import QImage
 import matplotlib.pyplot as plt
-
+import easyocr
 class ImageProcessor:
     def __init__(self):
         self.cv_image = None #Mantengo los cambios en una imagen "open cv"
@@ -13,7 +13,7 @@ class ImageProcessor:
         self.angulo_rotacion = 0
         self.rot_hist = [] #Historial de rotacion
         self.binar = False
-
+        self.ocr = easyocr.Reader(['es', 'en']) #Creo el objeto que lee
     def load_image(self, image_path):
         # Cargar la imagen usando OpenCV
         self.cv_image = cv2.imread(image_path)
@@ -204,6 +204,15 @@ class ImageProcessor:
         print(f"Punto más arriba en ROI: {topmost}")
         print(f"Punto más abajo en ROI: {bottommost}")
         
+    def OCR(self,rect):
+        try:
+            ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
+            read =self.ocr.readtext(ROI)
+            
+            for (bbox, text, prob) in read:
+                print(f'Texto: {text}, Confianza: {prob:.2f}')
+        except:
+            print("ERROR")
     def color_operators(self,operation,color):
         """
         Aplica la operacion seleccionada a la imagen CV\n

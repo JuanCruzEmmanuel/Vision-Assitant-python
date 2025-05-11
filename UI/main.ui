@@ -246,6 +246,7 @@ border-color: rgb(85, 255, 0);</string>
      <string>Machine Vision</string>
     </property>
     <addaction name="Clamp"/>
+    <addaction name="OCR_butt"/>
    </widget>
    <widget class="QMenu" name="menuIdentification">
     <property name="title">
@@ -412,6 +413,11 @@ border-color: rgb(85, 255, 0);</string>
   <action name="Apply_multiple">
    <property name="text">
     <string>Apply Folder Script</string>
+   </property>
+  </action>
+  <action name="OCR_butt">
+   <property name="text">
+    <string>OCR      Ctrl+1</string>
    </property>
   </action>
  </widget>
