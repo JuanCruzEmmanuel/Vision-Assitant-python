@@ -112,7 +112,12 @@ class CanvasWidget(QWidget):
                 painter.drawRect(rect)
                 painter.drawText(rect.topLeft(), label)
 
-
+            for nombre,rect,text in self.OCR_LIST:
+                painter.setPen(QPen(Qt.blue, 2, Qt.SolidLine))
+                painter.drawRect(rect)
+                painter.drawText(rect.topLeft(), nombre)
+                painter.drawText(rect.topRight(), text)
+                
             for rect, label in self.patrones:
                 painter.setPen(QPen(Qt.green, 2, Qt.SolidLine))
                 painter.drawRect(rect)
