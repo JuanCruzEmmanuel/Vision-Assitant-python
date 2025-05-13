@@ -27,9 +27,10 @@ class logger:
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
     ocr_lista = pyqtSignal(list)
-    def __init__(self, parent=None):
+    def __init__(self, parent=None,ocr=None):
         super().__init__(parent)
-        self.processor = ImageProcessor()
+        self.ocr = ocr
+        self.processor = ImageProcessor(ocr=self.ocr)
         self.qt_image = None #Mantengo una imagen en formato Qt_imagen
         self.start_point = None
         self.end_point = None
@@ -50,6 +51,7 @@ class CanvasWidget(QWidget):
         self.scrip_path = None
         self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
         self.OCR_LIST = []
+        #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
         """
@@ -184,6 +186,7 @@ class CanvasWidget(QWidget):
                 nombre_ocr = f"OCR_{N}"
                 
                 self.OCR_LIST.append((nombre_ocr,rect,text))
+                self.save_actions.append(("OCR",nombre_ocr,rect))
                 self.ocr_lista.emit(self.OCR_LIST)
             # Obtener la etiqueta del usuario
             #label, ok = QInputDialog.getText(self, "Etiqueta", "Ingrese la etiqueta:")
@@ -469,6 +472,28 @@ class CanvasWidget(QWidget):
                                 pass
                             elif process[0]=="apply_zapply_color_manipulationoom":
                                 pass
+                            elif process[0]=="OCR":
+                                #self.save_actions.append(("OCR",nombre_ocr,rect))
+                                nombre_ocr = process[1]
+                                rect = process[2]
+                                try:
+                                    ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
+                                    read =self.ocr.readtext(ROI)
+                                    TEXTO = ""
+                                    for (bbox, text, prob) in read:
+                                        #print(f'Texto: {text}, Confianza: {prob:.2f}')
+                                        if TEXTO == "":
+                                            TEXTO = text
+                                        else:
+                                            TEXTO +="  "+text
+                                    return TEXTO
+                                except:
+                                    print("ERROR")
+                                sumary[nombre_ocr] = {
+                                    "Type" :"OCR",
+                                    "rect":rect,
+                                    "Text":TEXTO
+                                }
                         #loop de procesos, se debe guardar la imagen en el path
                         filename = f"editado_{filename}"
                         sumary_file = f"sumary_{filename}.json"
@@ -534,6 +559,11 @@ class CanvasWidget(QWidget):
                             self.apply_plane_extraction(plane=FILTER_PROCESS[1],bw=FILTER_PROCESS[2])
                             log.set_text(text="Se aplica extraccion de plano de color")
                             log.printer()
+                        elif FILTER_PROCESS[0]=="OCR":
+                            text = self.processor.OCR(rect=FILTER_PROCESS[2])
+                            self.OCR_LIST.append((FILTER_PROCESS[1],FILTER_PROCESS[2],text))
+                            self.save_actions.append(("OCR",FILTER_PROCESS[1],FILTER_PROCESS[2]))
+                            self.ocr_lista.emit(self.OCR_LIST)
                         else:
                             log.set_text(text="No ha funcionado")
                             log.printer()

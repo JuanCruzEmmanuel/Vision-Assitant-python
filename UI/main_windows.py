@@ -1,5 +1,6 @@
 import sys
 import os
+import easyocr
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
@@ -37,7 +38,7 @@ class Main(QMainWindow):
 
     def  __init__(self):
         super().__init__()
-        
+        self.ocr = easyocr.Reader(['es', 'en'])
         uic.loadUi("UI/main.ui",self)
         
         self.select_kernel = Popup(window_title="Select Kernel", text="Block Size", text2="C") #Creo un popup en caso de necesitarlo
@@ -47,7 +48,7 @@ class Main(QMainWindow):
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
         #Bar Menu actions
         
-        self.canvas = CanvasWidget(self.img_conteiner) #This is the image control and is going to img_conteiner
+        self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
         
         self.img_display.addWidget(self.canvas) #Lo uso para que sea el widgets encargado de visor de imagen
         

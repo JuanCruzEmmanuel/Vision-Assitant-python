@@ -2,9 +2,9 @@ import cv2,os
 import numpy as np
 from PyQt5.QtGui import QImage
 import matplotlib.pyplot as plt
-import easyocr
+#import easyocr
 class ImageProcessor:
-    def __init__(self):
+    def __init__(self,ocr=None):
         self.cv_image = None #Mantengo los cambios en una imagen "open cv"
         self.patron = None
         self.patrones = []
@@ -13,7 +13,8 @@ class ImageProcessor:
         self.angulo_rotacion = 0
         self.rot_hist = [] #Historial de rotacion
         self.binar = False
-        self.ocr = easyocr.Reader(['es', 'en']) #Creo el objeto que lee
+        #self.ocr = easyocr.Reader(['es', 'en']) #Creo el objeto que lee
+        self.ocr=ocr
     def load_image(self, image_path):
         # Cargar la imagen usando OpenCV
         self.cv_image = cv2.imread(image_path)
