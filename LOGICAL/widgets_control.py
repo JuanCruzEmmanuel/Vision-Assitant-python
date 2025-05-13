@@ -505,71 +505,125 @@ class CanvasWidget(QWidget):
                         with open(path_guardado_sumary,"w") as sumary_file:
                             json.dump(sumary,sumary_file,ensure_ascii=False, indent=4)
             #Termina el loop de imagenes
-    def apply_script_and_continue_editing(self,debug=True):
+    def apply_script_and_continue_editing(self, debug=True):
         log = logger(debug=debug)
-        if self.qt_image != None: #Es importante tener cargado la imagen donde se va a aplicar el filtro
+        sumary = {}  # Para crear un dic a exportar
+
+        if self.qt_image is not None:
             log.set_text(text="ingreso 1")
             log.printer()
-            if self.scrip_path != None:
-                log.set_text(text="El path del script es distinto de vacio")
+
+            if self.scrip_path is not None:
+                log.set_text(text="El path del script es distinto de vacío")
                 log.printer()
+
                 with open(self.scrip_path, 'rb') as f:
                     FILTER_PROCESS_FULL = pickle.load(f)
-                    log.set_text(text="Se cargo correctamente el path")
+                    log.set_text(text="Se cargó correctamente el path")
                     log.printer()
+
                 for FILTER_PROCESS in FILTER_PROCESS_FULL:
                     try:
-                        if FILTER_PROCESS[0]=="load_image":
-                            pass
-                            #self.load_image(file_name=FILTER_PROCESS[1])
-                        elif FILTER_PROCESS[0]=="load_patern":
-                            self.select_pattern(path=FILTER_PROCESS[1],name=FILTER_PROCESS[2])
-                            log.set_text(text=f"Se cargo el patron con el nombre {FILTER_PROCESS[2]}")
+                        if FILTER_PROCESS[0] == "load_image":
+                            pass  # Ya está cargada
+                        elif FILTER_PROCESS[0] == "load_patern":
+                            self.select_pattern(path=FILTER_PROCESS[1], name=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se cargó el patrón con el nombre {FILTER_PROCESS[2]}")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="chop_loaded_pattern":
+                            sumary[f"Pattern loaded {FILTER_PROCESS[2]}"] = {
+                                "Name": FILTER_PROCESS[2],
+                                "Path": FILTER_PROCESS[1]
+                            }
+                        elif FILTER_PROCESS[0] == "chop_loaded_pattern":
                             self.chop_loaded_pattern()
-                            log.set_text(text="Se ha recortado el patron")
+                            log.set_text(text="Se ha recortado el patrón")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="apply_zoom":
+                            sumary["Choped"] = {
+                                "Chop": "Yes",
+                                "Name": "ID"
+                            }
+                        elif FILTER_PROCESS[0] == "apply_zoom":
                             self.apply_zoom(zoom=FILTER_PROCESS[1])
                             log.set_text(text="Se ha aplicado zoom")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_grayscale":
+                            sumary["Zoom"] = {
+                                "Zoom": FILTER_PROCESS[1],
+                                "Type": "cv2.INTER_CUBIC"
+                            }
+                        elif FILTER_PROCESS[0] == "apply_grayscale":
                             self.apply_grayscale()
-                            
                             log.set_text(text="Se ha aplicado escala de grises")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_flip":
+                            sumary["Grayscale"] = {"Applied": True}
+                        elif FILTER_PROCESS[0] == "apply_flip":
                             self.apply_flip()
-                            log.set_text(text="Se ha rotado La imagen")
+                            log.set_text(text="Se ha rotado la imagen")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_threshold_filter":
-                            self.apply_threshold_filter(kernel=FILTER_PROCESS[1],c=FILTER_PROCESS[2])
-                            log.set_text(text=f"Se a aplicado el filtro de umbralizado con un kernel de {FILTER_PROCESS[1]} y una matriz c de {FILTER_PROCESS[2]}")
+                            sumary["Flip"] = {"Applied": True}
+                        elif FILTER_PROCESS[0] == "apply_threshold_filter":
+                            self.apply_threshold_filter(kernel=FILTER_PROCESS[1], c=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se ha aplicado el filtro de umbralizado con un kernel de {FILTER_PROCESS[1]} y una matriz c de {FILTER_PROCESS[2]}")
                             log.printer()
+                            sumary["Threshold Filter"] = {
+                                "Type": "cv2.ADAPTIVE_THRESH_GAUSSIAN_C",
+                                "Kernel": FILTER_PROCESS[1],
+                                "C": FILTER_PROCESS[2]
+                            }
                         elif FILTER_PROCESS[0] == "apply_color_manipulation":
-                            self.apply_color_manipulation(operation=FILTER_PROCESS[1],color1=FILTER_PROCESS[2],color2=FILTER_PROCESS[3],color_change=FILTER_PROCESS[4])
-                            log.set_text(text="Se aplica manipulacion de colores")
+                            self.apply_color_manipulation(operation=FILTER_PROCESS[1], color1=FILTER_PROCESS[2], color2=FILTER_PROCESS[3], color_change=FILTER_PROCESS[4])
+                            log.set_text(text="Se aplica manipulación de colores")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_color_operators":      
-                            self.apply_color_operators(operation=FILTER_PROCESS[1],color=FILTER_PROCESS[2])
-                            log.set_text(text="Se aplica operacion de colores")
+                            sumary["Color Manipulation"] = {
+                                "Operation": FILTER_PROCESS[1],
+                                "Color1": FILTER_PROCESS[2],
+                                "Color2": FILTER_PROCESS[3],
+                                "Change": FILTER_PROCESS[4]
+                            }
+                        elif FILTER_PROCESS[0] == "apply_color_operators":
+                            self.apply_color_operators(operation=FILTER_PROCESS[1], color=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica operación de colores")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="apply_plane_extraction":
-                            self.apply_plane_extraction(plane=FILTER_PROCESS[1],bw=FILTER_PROCESS[2])
-                            log.set_text(text="Se aplica extraccion de plano de color")
+                            sumary["Color Operator"] = {
+                                "Operation": FILTER_PROCESS[1],
+                                "Color": FILTER_PROCESS[2]
+                            }
+                        elif FILTER_PROCESS[0] == "apply_plane_extraction":
+                            self.apply_plane_extraction(plane=FILTER_PROCESS[1], bw=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica extracción de plano de color")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="OCR":
+                            sumary["Plane Extraction"] = {
+                                "Plane": FILTER_PROCESS[1],
+                                "BW": FILTER_PROCESS[2]
+                            }
+                        elif FILTER_PROCESS[0] == "OCR":
                             text = self.processor.OCR(rect=FILTER_PROCESS[2])
-                            self.OCR_LIST.append((FILTER_PROCESS[1],FILTER_PROCESS[2],text))
-                            self.save_actions.append(("OCR",FILTER_PROCESS[1],FILTER_PROCESS[2]))
+                            self.OCR_LIST.append((FILTER_PROCESS[1], FILTER_PROCESS[2], text))
+                            self.save_actions.append(("OCR", FILTER_PROCESS[1], FILTER_PROCESS[2]))
                             self.ocr_lista.emit(self.OCR_LIST)
+                            sumary[FILTER_PROCESS[1]] = {
+                                "Type": "OCR",
+                                "rect": str(FILTER_PROCESS[2]),
+                                "Text": text
+                            }
                         else:
                             log.set_text(text="No ha funcionado")
                             log.printer()
-                            pass
-                            
-                    except:
+                    except Exception as e:
+                        log.set_text(text=f"Error en filtro {FILTER_PROCESS[0]}: {e}")
+                        log.printer()
                         pass
+
                 log.set_text(text="Se ha finalizado")
                 log.printer()
+
+        # Guardar el resumen en la misma carpeta del script
+        script_dir = os.path.dirname(self.scrip_path)  # Ruta del directorio que contiene el script
+        summary_path = os.path.join(script_dir, "summary_script_run.json")
+
+        try:
+            with open(summary_path, "w", encoding="utf-8") as summary_file:
+                json.dump(sumary, summary_file, ensure_ascii=False, indent=4)
+            if debug:
+                print(f"Resumen guardado en: {summary_path}")
+        except Exception as e:
+            print(f"Error al guardar el resumen: {e}")
