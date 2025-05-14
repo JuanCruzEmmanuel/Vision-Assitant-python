@@ -73,6 +73,7 @@ class CanvasWidget(QWidget):
         Se guardara el scripts en un primer momento formato pickle\n
         :path: Direccion donde se guardara el scripts
         """
+        name = "data" #Hasta que no se elija el nombre externamente, que se guarde como data... lo pongo aca, porque de por si esta como false
         if path==None:
             #En caso que no se especifique se guardara en /root/
             with open(f"{name}.pkl", "wb") as f:

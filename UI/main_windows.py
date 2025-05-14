@@ -15,7 +15,7 @@ from UI.generic_popup import Popup
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.0.7"
+__version__ = "1.0.9"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -32,6 +32,8 @@ VERSIONES
 1.0.5 Se agrega La operacion de colores
 1.0.6 Se agrega manipulacion de colores en hsv
 1.0.7 Se agrega el boton save scripts
+1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
+1.0.10 Se agrega el OCR
 """
 
 class Main(QMainWindow):
