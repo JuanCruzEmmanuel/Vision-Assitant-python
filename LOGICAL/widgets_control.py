@@ -60,6 +60,12 @@ class CanvasWidget(QWidget):
         
         return self.patrones, self.patrones_PATH
     
+    def get_ocr_list(self):
+        """
+        Devuelve la lista de OCR
+        """
+        return self.OCR_LIST
+    
     def set_patrones_list(self,patrones,patrones_path):
         """
         Carga la lista de los patrones
@@ -68,6 +74,14 @@ class CanvasWidget(QWidget):
         self.patrones = patrones
         self.patrones_PATH = patrones_path
         self.update() #Actualizo los eventos
+        
+    def set_ocr_list(self,OCR_list):
+        """
+        Actualiza la lista de OCR
+        """
+        self.OCR_LIST = OCR_list
+        self.update()
+         
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n

@@ -88,6 +88,8 @@ class Main(QMainWindow):
         self.Apply_script.triggered.connect(self.apply_script)
         
         self.OCR_butt.triggered.connect(self.apply_ocr)
+        
+        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -250,7 +252,27 @@ class Main(QMainWindow):
             self.ocr_table.setItem(row, 0, QTableWidgetItem(str(values[0])))
             self.ocr_table.setItem(row, 1, QTableWidgetItem(coord))
             self.ocr_table.setItem(row, 2, QTableWidgetItem(str(values[2])))
+            
+    def delete_selected_ocr(self):
+        try:
+            fila_seleccionada = self.ocr_table.currentRow()
+            nombre_ocr = self.ocr_table.item(fila_seleccionada, 0).text()
+        except:
+            print("No selecciono ninguna fila a eliminar")
+        OCR_LISTA = self.canvas.get_ocr_list()
+        _ocr_ = [] #aux
+        try:
+            for i,p in enumerate(OCR_LISTA):
+                if p[0]!=nombre_ocr:
+                    _ocr_.append(p)
 
+                else:
+                    print(f"Se ha eliminado el OCR {p}")
+        except:
+            pass
+        
+        self.canvas.set_ocr_list(OCR_list = _ocr_ )
+        self.update_lista_ocr(ocr_lista = _ocr_)
     def ocr_text(self):
         currentRow = self.ocr_table.currentRow()
         if currentRow == -1:
