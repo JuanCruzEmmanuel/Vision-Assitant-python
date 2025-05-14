@@ -26,9 +26,11 @@ class logger:
 
 class CanvasWidget(QWidget):
     patrones_lista = pyqtSignal(list)
-    def __init__(self, parent=None):
+    ocr_lista = pyqtSignal(list)
+    def __init__(self, parent=None,ocr=None):
         super().__init__(parent)
-        self.processor = ImageProcessor()
+        self.ocr = ocr
+        self.processor = ImageProcessor(ocr=self.ocr)
         self.qt_image = None #Mantengo una imagen en formato Qt_imagen
         self.start_point = None
         self.end_point = None
@@ -39,7 +41,7 @@ class CanvasWidget(QWidget):
         self.translation = QPoint(0, 0)  # Para el desplazamiento
         self.last_mouse_pos = None  # Para seguimiento del movimiento del ratón
         self.patron = False
-        self._CLANP_FLAG = False #Controla la señal de CLAMP
+        self.CLAMP_FLAG = False #Controla la señal de CLAMP
         self._CLAMP_HISTORY = [] #Guardo los clamps que se realicen
         self.ejes_ = False
         self.save_actions = []
@@ -47,7 +49,9 @@ class CanvasWidget(QWidget):
         self.SOURCE_FOLDER = None
         self.DESTINATION_FOLDER = None
         self.scrip_path = None
-        
+        self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
+        self.OCR_LIST = []
+        #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
         """
@@ -55,6 +59,12 @@ class CanvasWidget(QWidget):
         """   
         
         return self.patrones, self.patrones_PATH
+    
+    def get_ocr_list(self):
+        """
+        Devuelve la lista de OCR
+        """
+        return self.OCR_LIST
     
     def set_patrones_list(self,patrones,patrones_path):
         """
@@ -64,11 +74,20 @@ class CanvasWidget(QWidget):
         self.patrones = patrones
         self.patrones_PATH = patrones_path
         self.update() #Actualizo los eventos
+        
+    def set_ocr_list(self,OCR_list):
+        """
+        Actualiza la lista de OCR
+        """
+        self.OCR_LIST = OCR_list
+        self.update()
+         
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n
         :path: Direccion donde se guardara el scripts
         """
+        name = "data" #Hasta que no se elija el nombre externamente, que se guarde como data... lo pongo aca, porque de por si esta como false
         if path==None:
             #En caso que no se especifique se guardara en /root/
             with open(f"{name}.pkl", "wb") as f:
@@ -88,6 +107,8 @@ class CanvasWidget(QWidget):
     def load_image(self, file_name):
         self.processor.load_image(file_name) #Cargo la imagen para trabajarla como opencv
         self.qt_image = self.processor.get_qt_image()
+        self.OCR_LIST=[] #Reinicia la lista de OCR
+        self.patrones=[] #Creo que esta bien reiniciar esto
         self.rectangles = []  # Resetear recuadros al cargar una nueva imagen
         self.scale_factor = 1.0  # Resetear escala al cargar una nueva imagen
         self.translation = QPoint(0, 0)
@@ -110,7 +131,12 @@ class CanvasWidget(QWidget):
                 painter.drawRect(rect)
                 painter.drawText(rect.topLeft(), label)
 
-
+            for nombre,rect,text in self.OCR_LIST:
+                painter.setPen(QPen(Qt.blue, 2, Qt.SolidLine))
+                painter.drawRect(rect)
+                painter.drawText(rect.topLeft(), nombre)
+                painter.drawText(rect.topRight(), text)
+                
             for rect, label in self.patrones:
                 painter.setPen(QPen(Qt.green, 2, Qt.SolidLine))
                 painter.drawRect(rect)
@@ -158,11 +184,27 @@ class CanvasWidget(QWidget):
                     self.patrones.append((rect,nombre_patron))
 
                     self.patron = False
-            if self._CLANP_FLAG:
+            if self.CLAMP_FLAG:
+                self.OCR_FLAG =False #Para evitar conflictos con el OCR es mejor apagar el flag
                 print("generic_name")
                 #print(rect)
                 self.processor.clamp(rect=rect)
-
+                self.CLANP_FLAG=False
+                
+            if self.OCR_FLAG:
+                self.CLAMP_FLAG =False #Para evitar conflictos con la deteccion de picos, desactivo la bandera
+                #print("OCR")
+                text = self.processor.OCR(rect=rect)
+                self.OCR_FLAG=False
+                if self.OCR_LIST ==[]:
+                    N=0
+                else:
+                    N = len(self.OCR_LIST)
+                nombre_ocr = f"OCR_{N}"
+                
+                self.OCR_LIST.append((nombre_ocr,rect,text))
+                self.save_actions.append(("OCR",nombre_ocr,rect))
+                self.ocr_lista.emit(self.OCR_LIST)
             # Obtener la etiqueta del usuario
             #label, ok = QInputDialog.getText(self, "Etiqueta", "Ingrese la etiqueta:")
             #if ok and label:
@@ -335,7 +377,13 @@ class CanvasWidget(QWidget):
         """
         Activa la flag del clamp
         """
-        self._CLANP_FLAG = True
+        self.CLAMP_FLAG = not self.CLAMP_FLAG
+        
+    def apply_ocr(self):
+        """
+        Aplica el control del ocr
+        """
+        self.OCR_FLAG = not self.OCR_FLAG
         
         
     def apply_color_manipulation(self,operation,color1,color2,color_change):
@@ -441,6 +489,28 @@ class CanvasWidget(QWidget):
                                 pass
                             elif process[0]=="apply_zapply_color_manipulationoom":
                                 pass
+                            elif process[0]=="OCR":
+                                #self.save_actions.append(("OCR",nombre_ocr,rect))
+                                nombre_ocr = process[1]
+                                rect = process[2]
+                                try:
+                                    ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
+                                    read =self.ocr.readtext(ROI)
+                                    TEXTO = ""
+                                    for (bbox, text, prob) in read:
+                                        #print(f'Texto: {text}, Confianza: {prob:.2f}')
+                                        if TEXTO == "":
+                                            TEXTO = text
+                                        else:
+                                            TEXTO +="  "+text
+                                    return TEXTO
+                                except:
+                                    print("ERROR")
+                                sumary[nombre_ocr] = {
+                                    "Type" :"OCR",
+                                    "rect":rect,
+                                    "Text":TEXTO
+                                }
                         #loop de procesos, se debe guardar la imagen en el path
                         filename = f"editado_{filename}"
                         sumary_file = f"sumary_{filename}.json"
@@ -452,66 +522,125 @@ class CanvasWidget(QWidget):
                         with open(path_guardado_sumary,"w") as sumary_file:
                             json.dump(sumary,sumary_file,ensure_ascii=False, indent=4)
             #Termina el loop de imagenes
-    def apply_script_and_continue_editing(self,debug=True):
+    def apply_script_and_continue_editing(self, debug=True):
         log = logger(debug=debug)
-        if self.qt_image != None: #Es importante tener cargado la imagen donde se va a aplicar el filtro
+        sumary = {}  # Para crear un dic a exportar
+
+        if self.qt_image is not None:
             log.set_text(text="ingreso 1")
             log.printer()
-            if self.scrip_path != None:
-                log.set_text(text="El path del script es distinto de vacio")
+
+            if self.scrip_path is not None:
+                log.set_text(text="El path del script es distinto de vacío")
                 log.printer()
+
                 with open(self.scrip_path, 'rb') as f:
                     FILTER_PROCESS_FULL = pickle.load(f)
-                    log.set_text(text="Se cargo correctamente el path")
+                    log.set_text(text="Se cargó correctamente el path")
                     log.printer()
+
                 for FILTER_PROCESS in FILTER_PROCESS_FULL:
                     try:
-                        if FILTER_PROCESS[0]=="load_image":
-                            pass
-                            #self.load_image(file_name=FILTER_PROCESS[1])
-                        elif FILTER_PROCESS[0]=="load_patern":
-                            self.select_pattern(path=FILTER_PROCESS[1],name=FILTER_PROCESS[2])
-                            log.set_text(text=f"Se cargo el patron con el nombre {FILTER_PROCESS[2]}")
+                        if FILTER_PROCESS[0] == "load_image":
+                            pass  # Ya está cargada
+                        elif FILTER_PROCESS[0] == "load_patern":
+                            self.select_pattern(path=FILTER_PROCESS[1], name=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se cargó el patrón con el nombre {FILTER_PROCESS[2]}")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="chop_loaded_pattern":
+                            sumary[f"Pattern loaded {FILTER_PROCESS[2]}"] = {
+                                "Name": FILTER_PROCESS[2],
+                                "Path": FILTER_PROCESS[1]
+                            }
+                        elif FILTER_PROCESS[0] == "chop_loaded_pattern":
                             self.chop_loaded_pattern()
-                            log.set_text(text="Se ha recortado el patron")
+                            log.set_text(text="Se ha recortado el patrón")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="apply_zoom":
+                            sumary["Choped"] = {
+                                "Chop": "Yes",
+                                "Name": "ID"
+                            }
+                        elif FILTER_PROCESS[0] == "apply_zoom":
                             self.apply_zoom(zoom=FILTER_PROCESS[1])
                             log.set_text(text="Se ha aplicado zoom")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_grayscale":
+                            sumary["Zoom"] = {
+                                "Zoom": FILTER_PROCESS[1],
+                                "Type": "cv2.INTER_CUBIC"
+                            }
+                        elif FILTER_PROCESS[0] == "apply_grayscale":
                             self.apply_grayscale()
-                            
                             log.set_text(text="Se ha aplicado escala de grises")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_flip":
+                            sumary["Grayscale"] = {"Applied": True}
+                        elif FILTER_PROCESS[0] == "apply_flip":
                             self.apply_flip()
-                            log.set_text(text="Se ha rotado La imagen")
+                            log.set_text(text="Se ha rotado la imagen")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_threshold_filter":
-                            self.apply_threshold_filter(kernel=FILTER_PROCESS[1],c=FILTER_PROCESS[2])
-                            log.set_text(text=f"Se a aplicado el filtro de umbralizado con un kernel de {FILTER_PROCESS[1]} y una matriz c de {FILTER_PROCESS[2]}")
+                            sumary["Flip"] = {"Applied": True}
+                        elif FILTER_PROCESS[0] == "apply_threshold_filter":
+                            self.apply_threshold_filter(kernel=FILTER_PROCESS[1], c=FILTER_PROCESS[2])
+                            log.set_text(text=f"Se ha aplicado el filtro de umbralizado con un kernel de {FILTER_PROCESS[1]} y una matriz c de {FILTER_PROCESS[2]}")
                             log.printer()
+                            sumary["Threshold Filter"] = {
+                                "Type": "cv2.ADAPTIVE_THRESH_GAUSSIAN_C",
+                                "Kernel": FILTER_PROCESS[1],
+                                "C": FILTER_PROCESS[2]
+                            }
                         elif FILTER_PROCESS[0] == "apply_color_manipulation":
-                            self.apply_color_manipulation(operation=FILTER_PROCESS[1],color1=FILTER_PROCESS[2],color2=FILTER_PROCESS[3],color_change=FILTER_PROCESS[4])
-                            log.set_text(text="Se aplica manipulacion de colores")
+                            self.apply_color_manipulation(operation=FILTER_PROCESS[1], color1=FILTER_PROCESS[2], color2=FILTER_PROCESS[3], color_change=FILTER_PROCESS[4])
+                            log.set_text(text="Se aplica manipulación de colores")
                             log.printer()
-                        elif FILTER_PROCESS[0] =="apply_color_operators":      
-                            self.apply_color_operators(operation=FILTER_PROCESS[1],color=FILTER_PROCESS[2])
-                            log.set_text(text="Se aplica operacion de colores")
+                            sumary["Color Manipulation"] = {
+                                "Operation": FILTER_PROCESS[1],
+                                "Color1": FILTER_PROCESS[2],
+                                "Color2": FILTER_PROCESS[3],
+                                "Change": FILTER_PROCESS[4]
+                            }
+                        elif FILTER_PROCESS[0] == "apply_color_operators":
+                            self.apply_color_operators(operation=FILTER_PROCESS[1], color=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica operación de colores")
                             log.printer()
-                        elif FILTER_PROCESS[0]=="apply_plane_extraction":
-                            self.apply_plane_extraction(plane=FILTER_PROCESS[1],bw=FILTER_PROCESS[2])
-                            log.set_text(text="Se aplica extraccion de plano de color")
+                            sumary["Color Operator"] = {
+                                "Operation": FILTER_PROCESS[1],
+                                "Color": FILTER_PROCESS[2]
+                            }
+                        elif FILTER_PROCESS[0] == "apply_plane_extraction":
+                            self.apply_plane_extraction(plane=FILTER_PROCESS[1], bw=FILTER_PROCESS[2])
+                            log.set_text(text="Se aplica extracción de plano de color")
                             log.printer()
+                            sumary["Plane Extraction"] = {
+                                "Plane": FILTER_PROCESS[1],
+                                "BW": FILTER_PROCESS[2]
+                            }
+                        elif FILTER_PROCESS[0] == "OCR":
+                            text = self.processor.OCR(rect=FILTER_PROCESS[2])
+                            self.OCR_LIST.append((FILTER_PROCESS[1], FILTER_PROCESS[2], text))
+                            self.save_actions.append(("OCR", FILTER_PROCESS[1], FILTER_PROCESS[2]))
+                            self.ocr_lista.emit(self.OCR_LIST)
+                            sumary[FILTER_PROCESS[1]] = {
+                                "Type": "OCR",
+                                "rect": str(FILTER_PROCESS[2]),
+                                "Text": text
+                            }
                         else:
                             log.set_text(text="No ha funcionado")
                             log.printer()
-                            pass
-                            
-                    except:
+                    except Exception as e:
+                        log.set_text(text=f"Error en filtro {FILTER_PROCESS[0]}: {e}")
+                        log.printer()
                         pass
+
                 log.set_text(text="Se ha finalizado")
                 log.printer()
+
+        # Guardar el resumen en la misma carpeta del script
+        script_dir = os.path.dirname(self.scrip_path)  # Ruta del directorio que contiene el script
+        summary_path = os.path.join(script_dir, "summary_script_run.json")
+
+        try:
+            with open(summary_path, "w", encoding="utf-8") as summary_file:
+                json.dump(sumary, summary_file, ensure_ascii=False, indent=4)
+            if debug:
+                print(f"Resumen guardado en: {summary_path}")
+        except Exception as e:
+            print(f"Error al guardar el resumen: {e}")

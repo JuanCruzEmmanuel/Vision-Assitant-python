@@ -1,5 +1,6 @@
 import sys
 import os
+import easyocr
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
@@ -14,7 +15,7 @@ from UI.generic_popup import Popup
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.0.7"
+__version__ = "1.0.9"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -31,13 +32,15 @@ VERSIONES
 1.0.5 Se agrega La operacion de colores
 1.0.6 Se agrega manipulacion de colores en hsv
 1.0.7 Se agrega el boton save scripts
+1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
+1.0.10 Se agrega el OCR
 """
 
 class Main(QMainWindow):
 
     def  __init__(self):
         super().__init__()
-        
+        self.ocr = easyocr.Reader(['es', 'en'])
         uic.loadUi("UI/main.ui",self)
         
         self.select_kernel = Popup(window_title="Select Kernel", text="Block Size", text2="C") #Creo un popup en caso de necesitarlo
@@ -47,7 +50,7 @@ class Main(QMainWindow):
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
         #Bar Menu actions
         
-        self.canvas = CanvasWidget(self.img_conteiner) #This is the image control and is going to img_conteiner
+        self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
         
         self.img_display.addWidget(self.canvas) #Lo uso para que sea el widgets encargado de visor de imagen
         
@@ -83,6 +86,10 @@ class Main(QMainWindow):
         self.Apply_multiple.triggered.connect(self.apply_multiple_imagen)
         
         self.Apply_script.triggered.connect(self.apply_script)
+        
+        self.OCR_butt.triggered.connect(self.apply_ocr)
+        
+        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -95,7 +102,11 @@ class Main(QMainWindow):
         
         #Señales
         
-        self.canvas.patrones_lista.connect(self.update_lista_patrones)        
+        self.canvas.patrones_lista.connect(self.update_lista_patrones)
+        self.canvas.ocr_lista.connect(self.update_lista_ocr)
+        
+        #Updates
+        self.ocr_table.clicked.connect(self.ocr_text)
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
@@ -227,6 +238,51 @@ class Main(QMainWindow):
         self.canvas.scrip_path=file_name
         self.canvas.apply_script_and_continue_editing(debug=True)
 
+    def apply_ocr(self):
+        """
+        Activa el flag ocr
+        """
+        self.canvas.apply_ocr()
+
+    def update_lista_ocr(self,ocr_lista):
+
+        self.ocr_table.setRowCount(len(ocr_lista))
+        for row, values in enumerate(ocr_lista):
+            coord = f"({values[1].x()},{values[1].width()}),({values[1].y()},{values[1].height()})" #(x0,x1),(y0,y1)
+            self.ocr_table.setItem(row, 0, QTableWidgetItem(str(values[0])))
+            self.ocr_table.setItem(row, 1, QTableWidgetItem(coord))
+            self.ocr_table.setItem(row, 2, QTableWidgetItem(str(values[2])))
+            
+    def delete_selected_ocr(self):
+        try:
+            fila_seleccionada = self.ocr_table.currentRow()
+            nombre_ocr = self.ocr_table.item(fila_seleccionada, 0).text()
+        except:
+            print("No selecciono ninguna fila a eliminar")
+        OCR_LISTA = self.canvas.get_ocr_list()
+        _ocr_ = [] #aux
+        try:
+            for i,p in enumerate(OCR_LISTA):
+                if p[0]!=nombre_ocr:
+                    _ocr_.append(p)
+
+                else:
+                    print(f"Se ha eliminado el OCR {p}")
+        except:
+            pass
+        
+        self.canvas.set_ocr_list(OCR_list = _ocr_ )
+        self.update_lista_ocr(ocr_lista = _ocr_)
+    def ocr_text(self):
+        currentRow = self.ocr_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.ocr_table.item(currentRow, col).text()
+            for col in range(self.ocr_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        #print(rowValue)
+        self.OCR_TEXT.setText(rowValue[2])
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

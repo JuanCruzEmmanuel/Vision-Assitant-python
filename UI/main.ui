@@ -71,6 +71,29 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
+       <widget class="QTextEdit" name="OCR_TEXT">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>1331</width>
+          <height>41</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>3</x>
+          <y>2</y>
+          <width>101</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>OCR RESULTADO</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="extras_widgets" native="true">
        <property name="geometry">
@@ -121,6 +144,9 @@ border-color: rgb(85, 255, 0);</string>
         <attribute name="horizontalHeaderHighlightSections">
          <bool>false</bool>
         </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
         <column>
          <property name="text">
           <string>NOMBRE</string>
@@ -149,7 +175,7 @@ border-color: rgb(85, 255, 0);</string>
        <widget class="QPushButton" name="Delete_pattern">
         <property name="geometry">
          <rect>
-          <x>134</x>
+          <x>70</x>
           <y>250</y>
           <width>91</width>
           <height>23</height>
@@ -157,6 +183,69 @@ border-color: rgb(85, 255, 0);</string>
         </property>
         <property name="text">
          <string>DELETE PATTERN</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="ocr_table">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>301</y>
+          <width>221</width>
+          <height>341</height>
+         </rect>
+        </property>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>73</number>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>10</number>
+        </attribute>
+        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>NOMBRE</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>COOR</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>RESULTADO</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QPushButton" name="delete_ocr">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>660</y>
+          <width>91</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>DELETE OCR</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="cambiar_nombre">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>660</y>
+          <width>111</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CAMBIAR NOMBRE</string>
         </property>
        </widget>
       </widget>
@@ -246,6 +335,7 @@ border-color: rgb(85, 255, 0);</string>
      <string>Machine Vision</string>
     </property>
     <addaction name="Clamp"/>
+    <addaction name="OCR_butt"/>
    </widget>
    <widget class="QMenu" name="menuIdentification">
     <property name="title">
@@ -412,6 +502,11 @@ border-color: rgb(85, 255, 0);</string>
   <action name="Apply_multiple">
    <property name="text">
     <string>Apply Folder Script</string>
+   </property>
+  </action>
+  <action name="OCR_butt">
+   <property name="text">
+    <string>OCR      Ctrl+1</string>
    </property>
   </action>
  </widget>
