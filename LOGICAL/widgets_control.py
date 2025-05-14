@@ -93,6 +93,8 @@ class CanvasWidget(QWidget):
     def load_image(self, file_name):
         self.processor.load_image(file_name) #Cargo la imagen para trabajarla como opencv
         self.qt_image = self.processor.get_qt_image()
+        self.OCR_LIST=[] #Reinicia la lista de OCR
+        self.patrones=[] #Creo que esta bien reiniciar esto
         self.rectangles = []  # Resetear recuadros al cargar una nueva imagen
         self.scale_factor = 1.0  # Resetear escala al cargar una nueva imagen
         self.translation = QPoint(0, 0)
