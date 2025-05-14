@@ -15,7 +15,7 @@ from UI.generic_popup import Popup
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.0.9"
+__version__ = "1.1.0"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -34,6 +34,7 @@ VERSIONES
 1.0.7 Se agrega el boton save scripts
 1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
 1.0.10 Se agrega el OCR
+1.1.0 Se cambia la interfaz grafica, agregando un stackedWidget
 """
 
 class Main(QMainWindow):
@@ -48,6 +49,8 @@ class Main(QMainWindow):
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
         self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
+
+        self.stackedWidget.setCurrentWidget(self.main_page)
         #Bar Menu actions
         
         self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
