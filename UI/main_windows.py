@@ -4,6 +4,7 @@ import easyocr
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
+from PyQt5.QtCore import Qt
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
 from UI.color_operators import ColorOperator
@@ -35,7 +36,7 @@ VERSIONES
 1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
 1.0.10 Se agrega el OCR
 1.1.0 Se cambia la interfaz grafica, agregando un stackedWidget
-1.1.1 
+1.1.1 Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
 """
 
 class Main(QMainWindow):
@@ -108,6 +109,7 @@ class Main(QMainWindow):
         self.pattern = QShortcut(QKeySequence("Ctrl+p"), self).activated.connect(self.open_patron) #Atajo seleccionar patron imagen
         self.chop = QShortcut(QKeySequence("Ctrl+x"), self).activated.connect(self.canvas.chop_loaded_pattern) #Atajo cortar patron
         self.shortcut_save_scripts =QShortcut(QKeySequence("Ctrl+s"), self).activated.connect(self.canvas.save_scripts) #Atajo Guardar scripts
+        self.change_windows = QShortcut(QKeySequence("Right"), self).activated.connect(self.change_numeric) #Atajo Guardar scripts
         
         #Señales
         
