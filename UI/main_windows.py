@@ -15,7 +15,7 @@ from UI.generic_popup import Popup
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -35,6 +35,7 @@ VERSIONES
 1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
 1.0.10 Se agrega el OCR
 1.1.0 Se cambia la interfaz grafica, agregando un stackedWidget
+1.1.1 
 """
 
 class Main(QMainWindow):
@@ -51,6 +52,7 @@ class Main(QMainWindow):
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
 
         self.stackedWidget.setCurrentWidget(self.main_page)
+        self.MAIN_FLAG = True
         #Bar Menu actions
         
         self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
@@ -93,6 +95,8 @@ class Main(QMainWindow):
         self.OCR_butt.triggered.connect(self.apply_ocr)
         
         self.delete_ocr.clicked.connect(self.delete_selected_ocr)
+        
+        self.change_to_numeric.triggered.connect(self.change_numeric)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -286,6 +290,14 @@ class Main(QMainWindow):
         ] #Me devuelve una lista con los valores seleccionado en ese indice
         #print(rowValue)
         self.OCR_TEXT.setText(rowValue[2])
+        
+    def change_numeric(self):
+        if self.MAIN_FLAG: #Si estoy en la main, cambio
+            self.stackedWidget.setCurrentWidget(self.numeric_page)
+            self.MAIN_FLAG=False #Activo que no estoy en el main
+        else: #Si no estoy en la main, regreso
+            self.stackedWidget.setCurrentWidget(self.main_page)
+            self.MAIN_FLAG = True
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
