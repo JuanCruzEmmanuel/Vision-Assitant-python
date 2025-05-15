@@ -204,7 +204,22 @@ class ImageProcessor:
         bottommost = COORDS[np.argmax(COORDS[:, 0])]
         print(f"Punto más arriba en ROI: {topmost}")
         print(f"Punto más abajo en ROI: {bottommost}")
-        
+    
+    def toNumeric(self,rect):
+        try:
+            ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
+            ROI = cv2.cvtColor(ROI,cv2.COLOR_BGR2GRAY)
+            #curva_y = np.argmax(ROI, axis=0)
+            curva_y = ROI.shape[0] - np.argmax(ROI, axis=0)
+            import matplotlib.pyplot as plt
+            plt.scatter(np.arange(len(curva_y)), curva_y, s=2)  # s=2 controla el tamaño de los puntos
+            plt.title("Curva extraída desde la imagen")
+            plt.show()
+        except:
+            print("ERROR")
+            pass
+    
+    
     def OCR(self,rect):
         try:
             ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]

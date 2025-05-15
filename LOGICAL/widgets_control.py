@@ -51,6 +51,8 @@ class CanvasWidget(QWidget):
         self.scrip_path = None
         self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
         self.OCR_LIST = []
+        
+        self.NUMERIC_FLAG = False
         #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
@@ -210,7 +212,12 @@ class CanvasWidget(QWidget):
             #if ok and label:
                 #color = self.get_color_for_label(label)
                 #self.rectangles.append((rect, label, color))
-
+            if self.NUMERIC_FLAG:
+                self.OCR_FLAG=False #desactivo la bandera para evitar conflictos
+                self.CLAMP_FLAG=False #desactivo la bandera para evitar conflictos
+                self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
+                self.processor.toNumeric(rect=rect)
+                
             self.start_point = None
             self.end_point = None
             self.update()
@@ -372,7 +379,7 @@ class CanvasWidget(QWidget):
         self.save_actions.append(("apply_color_operators",operation,color))
         
         self.update()
-    
+#*************************************************FLAG******************************************************************
     def apply_clamp(self):
         """
         Activa la flag del clamp
@@ -385,6 +392,11 @@ class CanvasWidget(QWidget):
         """
         self.OCR_FLAG = not self.OCR_FLAG
         
+    def apply_image_to_numeric(self):
+        """
+        Para poder seleccionar la parte donde quiero convertir la imagen en numerico
+        """
+        self.NUMERIC_FLAG = not self.NUMERIC_FLAG
         
     def apply_color_manipulation(self,operation,color1,color2,color_change):
         """

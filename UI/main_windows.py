@@ -97,6 +97,8 @@ class Main(QMainWindow):
         self.delete_ocr.clicked.connect(self.delete_selected_ocr)
         
         self.change_to_numeric.triggered.connect(self.change_numeric)
+        
+        self.To_numeric.triggered.connect(self.apply_im_to_num)
         #Atajos de teclado
         
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -298,6 +300,11 @@ class Main(QMainWindow):
         else: #Si no estoy en la main, regreso
             self.stackedWidget.setCurrentWidget(self.main_page)
             self.MAIN_FLAG = True
+    def apply_im_to_num(self):
+        """
+        Activa la flag para numerico
+        """
+        self.canvas.apply_image_to_numeric()
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
