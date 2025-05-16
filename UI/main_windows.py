@@ -109,8 +109,10 @@ class Main(QMainWindow):
         self.change_to_numeric.triggered.connect(self.change_numeric)
         
         self.To_numeric.triggered.connect(self.apply_im_to_num)
+
+        self.cambiar_nombre_imagen_numerica.clicked.connect(self.change_numeric_name)
+
         #Atajos de teclado
-        
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
         self.shortcut_flip = QShortcut(QKeySequence("Ctrl+w"), self).activated.connect(self.canvas.apply_flip) #Atajo flip
         self.shortcut_gray = QShortcut(QKeySequence("Ctrl+q"), self).activated.connect(self.canvas.apply_grayscale) #Atajo gray scale
@@ -338,7 +340,6 @@ class Main(QMainWindow):
             self.numeric_image_table.item(currentRow, col).text()
             for col in range(self.numeric_image_table.columnCount())
         ] #Me devuelve una lista con los valores seleccionado en ese indice
-        print(rowValue[0])
         lista_numerica_ = self.canvas.get_numeric_list()
         for numerica in lista_numerica_:
             if numerica[0]==rowValue[0]:
@@ -346,6 +347,13 @@ class Main(QMainWindow):
                 y = numerica[2]
                 self.graph_widget.clear()
                 self.graph_widget.plot(x, y, pen='r')  
+    def change_numeric_name(self):
+        lista_numerica_ = self.canvas.get_numeric_list()
+        nombre_actualizado = [self.numeric_image_table.item(0, col).text()
+        for col in range(self.numeric_image_table.columnCount())]
+        for i in range(len(lista_numerica_)):
+            lista_numerica_[i][0] =nombre_actualizado[i]
+        self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

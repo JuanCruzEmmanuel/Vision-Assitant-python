@@ -55,6 +55,7 @@ class CanvasWidget(QWidget):
         
         self.NUMERIC_FLAG = False
         self.NUMERIC_LIST = [] #lista para almacenar los datos
+        self.INDEX_NUMERIC = -1 #Significa que no tengo nada
         #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
@@ -87,7 +88,15 @@ class CanvasWidget(QWidget):
         self.update()
          
     def get_numeric_list(self):
+        """
+        Devuelve la lista numerica
+        """
         return self.NUMERIC_LIST
+    def set_numeric_list(self,lista_numerica):
+        """
+        Setea la lista numerica de manera externa
+        """
+        self.NUMERIC_LIST = lista_numerica
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n
@@ -222,7 +231,7 @@ class CanvasWidget(QWidget):
                 self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
                 x,y = self.processor.toNumeric(rect=rect)
                 N = len(self.NUMERIC_LIST)
-                self.NUMERIC_LIST.append((f"curve_{N}",x,y))
+                self.NUMERIC_LIST.append([f"curve_{N}",x,y])
                 self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
                 
             self.start_point = None
