@@ -25,8 +25,9 @@ class logger:
         
 
 class CanvasWidget(QWidget):
-    patrones_lista = pyqtSignal(list)
-    ocr_lista = pyqtSignal(list)
+    patrones_lista = pyqtSignal(list) #Señal que se envia para controlar la tabla de patrones
+    ocr_lista = pyqtSignal(list) #Señal que controla la tabla de ocr
+    numeric_list = pyqtSignal(list) #Señal que controla la lista numerica
     def __init__(self, parent=None,ocr=None):
         super().__init__(parent)
         self.ocr = ocr
@@ -53,6 +54,7 @@ class CanvasWidget(QWidget):
         self.OCR_LIST = []
         
         self.NUMERIC_FLAG = False
+        self.NUMERIC_LIST = [] #lista para almacenar los datos
         #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
@@ -84,6 +86,8 @@ class CanvasWidget(QWidget):
         self.OCR_LIST = OCR_list
         self.update()
          
+    def get_numeric_list(self):
+        return self.NUMERIC_LIST
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n
@@ -216,7 +220,10 @@ class CanvasWidget(QWidget):
                 self.OCR_FLAG=False #desactivo la bandera para evitar conflictos
                 self.CLAMP_FLAG=False #desactivo la bandera para evitar conflictos
                 self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
-                self.processor.toNumeric(rect=rect)
+                x,y = self.processor.toNumeric(rect=rect)
+                N = len(self.NUMERIC_LIST)
+                self.NUMERIC_LIST.append((f"curve_{N}",x,y))
+                self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
                 
             self.start_point = None
             self.end_point = None

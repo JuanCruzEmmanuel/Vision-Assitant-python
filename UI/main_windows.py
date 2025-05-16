@@ -3,7 +3,7 @@ import os
 import easyocr
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem,QVBoxLayout
 from PyQt5.QtCore import Qt
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
@@ -12,11 +12,12 @@ from UI.color_manipulation import colorManipulation
 from UI.Select_patern import selectPattern
 from PyQt5.QtGui import QKeySequence
 from UI.generic_popup import Popup
-
+import pyqtgraph as pg
+import numpy as np
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -37,6 +38,7 @@ VERSIONES
 1.0.10 Se agrega el OCR
 1.1.0 Se cambia la interfaz grafica, agregando un stackedWidget
 1.1.1 Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
+1.1.2 agrego funciones y pyqtgrapgh para la windows 2
 """
 
 class Main(QMainWindow):
@@ -54,7 +56,14 @@ class Main(QMainWindow):
 
         self.stackedWidget.setCurrentWidget(self.main_page)
         self.MAIN_FLAG = True
+        ####Agrego visor de imagenes
+        self.graph_widget = pg.PlotWidget() #Creo el objeto a controlar
+        x = np.linspace(0, 10, 1000) #Creo una funcion generica facil de usar
+        y = np.sin(x)
+        self.graph_widget.plot(x, y, pen='r')  
+        
         #Bar Menu actions
+    
         
         self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
         
@@ -115,9 +124,16 @@ class Main(QMainWindow):
         
         self.canvas.patrones_lista.connect(self.update_lista_patrones)
         self.canvas.ocr_lista.connect(self.update_lista_ocr)
+        self.canvas.numeric_list.connect(self.update_lista_numerica)
         
         #Updates
         self.ocr_table.clicked.connect(self.ocr_text)
+        self.numeric_image_table.clicked.connect(self.update_grafico_numerico)
+        
+        
+        layout = QVBoxLayout(self.imagen_numeric)
+        layout.addWidget(self.graph_widget)
+        self.imagen_numeric.setLayout(layout)
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
@@ -307,6 +323,29 @@ class Main(QMainWindow):
         Activa la flag para numerico
         """
         self.canvas.apply_image_to_numeric()
+        
+    ##Actualizar lista numerica
+    def update_lista_numerica(self,lista_num):
+        self.numeric_image_table.setRowCount(len(lista_num)) #Seteo la cantidad de filas "rows"
+        for row, values in enumerate(lista_num):
+            self.numeric_image_table.setItem(row, 0, QTableWidgetItem(str(values[0]))) #0 nombre; 1=x[~]; 2=y[~]
+            
+    def update_grafico_numerico(self):
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        print(rowValue[0])
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            if numerica[0]==rowValue[0]:
+                x = numerica[1]
+                y = numerica[2]
+                self.graph_widget.clear()
+                self.graph_widget.plot(x, y, pen='r')  
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

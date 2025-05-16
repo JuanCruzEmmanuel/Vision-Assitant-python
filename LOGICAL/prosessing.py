@@ -226,11 +226,12 @@ class ImageProcessor:
 
             #curva_y = np.argmax(ROI, axis=0)
             #curva_y = ROI.shape[0] - np.argmax(ROI, axis=0)
-            import matplotlib.pyplot as plt
-            plt.plot(x_unicos, -y_medios, label='Original', alpha=0.5)
+            #import matplotlib.pyplot as plt
+            #plt.plot(x_unicos, -y_medios, label='Original', alpha=0.5)
             #plt.scatter(np.arange(len(curva_y)), curva_y, s=2)  # s=2 controla el tamaño de los puntos
-            plt.title("Curva extraída desde la imagen")
-            plt.show()
+            #plt.title("Curva extraída desde la imagen")
+            #plt.show()
+            return x_unicos,-y_medios
         except:
             print("ERROR")
             pass
