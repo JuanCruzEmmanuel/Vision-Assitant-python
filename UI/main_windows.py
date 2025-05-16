@@ -92,7 +92,6 @@ class Main(QMainWindow):
         
         self.Save_Script.triggered.connect(self.canvas.save_scripts)
         
-        self.Delete_pattern.clicked.connect(self.delete_patron)
         
         self.Select_source_folder.triggered.connect(self.select_folder)
         
@@ -104,13 +103,17 @@ class Main(QMainWindow):
         
         self.OCR_butt.triggered.connect(self.apply_ocr)
         
-        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
-        
         self.change_to_numeric.triggered.connect(self.change_numeric)
         
         self.To_numeric.triggered.connect(self.apply_im_to_num)
 
+        
+
+        #BOTONES
+        self.Delete_pattern.clicked.connect(self.delete_patron)
+        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
         self.cambiar_nombre_imagen_numerica.clicked.connect(self.change_numeric_name)
+        self.max_btn.clicked.connect(self.measure_max_value)
 
         #Atajos de teclado
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
@@ -123,7 +126,6 @@ class Main(QMainWindow):
         self.change_windows = QShortcut(QKeySequence("Right"), self).activated.connect(self.change_numeric) #Atajo Guardar scripts
         
         #Señales
-        
         self.canvas.patrones_lista.connect(self.update_lista_patrones)
         self.canvas.ocr_lista.connect(self.update_lista_ocr)
         self.canvas.numeric_list.connect(self.update_lista_numerica)
@@ -354,6 +356,9 @@ class Main(QMainWindow):
         for i in range(len(lista_numerica_)):
             lista_numerica_[i][0] =nombre_actualizado[i]
         self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
+
+    def measure_max_value(self):
+        pass
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
