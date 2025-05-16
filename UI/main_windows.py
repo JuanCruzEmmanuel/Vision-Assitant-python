@@ -358,7 +358,23 @@ class Main(QMainWindow):
         self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
 
     def measure_max_value(self):
-        pass
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            if numerica[0]==rowValue[0]:
+                x = numerica[1]
+                y = numerica[2]
+                i_max = np.argmax(y)
+                x_max = x[i_max]
+                y_max = y[i_max]
+                self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                #self.graph_widget.clear() 
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
