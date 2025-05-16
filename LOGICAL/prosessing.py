@@ -223,6 +223,7 @@ class ImageProcessor:
             # Convertir a arrays para trabajar más fácil
             x_unicos = np.array(x_unicos)
             y_medios = np.array(y_medios)
+            y_medios = ROI.shape[0] - y_medios
 
             #curva_y = np.argmax(ROI, axis=0)
             #curva_y = ROI.shape[0] - np.argmax(ROI, axis=0)
@@ -231,7 +232,7 @@ class ImageProcessor:
             #plt.scatter(np.arange(len(curva_y)), curva_y, s=2)  # s=2 controla el tamaño de los puntos
             #plt.title("Curva extraída desde la imagen")
             #plt.show()
-            return x_unicos,-y_medios
+            return x_unicos,y_medios
         except:
             print("ERROR")
             pass
