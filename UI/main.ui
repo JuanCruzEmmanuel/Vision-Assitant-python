@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="main_page">
        <widget class="QFrame" name="Conteiner">
@@ -297,6 +297,40 @@ border-color: rgb(85, 255, 0);</string>
              <width>281</width>
              <height>821</height>
             </rect>
+           </property>
+           <widget class="QTableWidget" name="numeric_image_table">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>11</y>
+              <width>281</width>
+              <height>371</height>
+             </rect>
+            </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>IMAGEN</string>
+             </property>
+            </column>
+           </widget>
+          </widget>
+          <widget class="QFrame" name="imagen_numeric">
+           <property name="geometry">
+            <rect>
+             <x>280</x>
+             <y>0</y>
+             <width>1041</width>
+             <height>811</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
            </property>
           </widget>
          </widget>
