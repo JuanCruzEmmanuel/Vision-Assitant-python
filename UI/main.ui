@@ -295,7 +295,7 @@ border-color: rgb(85, 255, 0);</string>
              <x>0</x>
              <y>-1</y>
              <width>281</width>
-             <height>821</height>
+             <height>811</height>
             </rect>
            </property>
            <widget class="QTableWidget" name="numeric_image_table">
@@ -304,7 +304,7 @@ border-color: rgb(85, 255, 0);</string>
               <x>0</x>
               <y>11</y>
               <width>281</width>
-              <height>371</height>
+              <height>311</height>
              </rect>
             </property>
             <attribute name="horizontalHeaderStretchLastSection">
@@ -315,6 +315,58 @@ border-color: rgb(85, 255, 0);</string>
               <string>IMAGEN</string>
              </property>
             </column>
+           </widget>
+           <widget class="QPushButton" name="cambiar_nombre_imagen_numerica">
+            <property name="geometry">
+             <rect>
+              <x>90</x>
+              <y>330</y>
+              <width>101</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>CAMBIAR NOMBRE</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="smooth_btn">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>380</y>
+              <width>91</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>SMOOTH</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="max_btn">
+            <property name="geometry">
+             <rect>
+              <x>90</x>
+              <y>380</y>
+              <width>101</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>MAX</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="min_btn">
+            <property name="geometry">
+             <rect>
+              <x>190</x>
+              <y>380</y>
+              <width>91</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>MIN</string>
+            </property>
            </widget>
           </widget>
           <widget class="QFrame" name="imagen_numeric">
