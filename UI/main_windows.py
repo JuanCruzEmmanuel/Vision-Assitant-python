@@ -114,7 +114,7 @@ class Main(QMainWindow):
         self.delete_ocr.clicked.connect(self.delete_selected_ocr)
         self.cambiar_nombre_imagen_numerica.clicked.connect(self.change_numeric_name)
         self.max_btn.clicked.connect(self.measure_max_value)
-
+        self.min_btn.clicked.connect(self.measure_min_value)
         #Atajos de teclado
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
         self.shortcut_flip = QShortcut(QKeySequence("Ctrl+w"), self).activated.connect(self.canvas.apply_flip) #Atajo flip
@@ -358,6 +358,9 @@ class Main(QMainWindow):
         self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
 
     def measure_max_value(self):
+        """
+        Mide el maximo y lo grafica
+        """
         currentRow = self.numeric_image_table.currentRow()
         if currentRow == -1:
             pass
@@ -374,6 +377,27 @@ class Main(QMainWindow):
                 x_max = x[i_max]
                 y_max = y[i_max]
                 self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                #self.graph_widget.clear() 
+    def measure_min_value(self):
+        """
+        Mide el valor minimo y lo grafica
+        """
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            if numerica[0]==rowValue[0]:
+                x = numerica[1]
+                y = numerica[2]
+                i_min = np.argmin(y)
+                x_min = x[i_min]
+                y_min = y[i_min]
+                self.graph_widget.plot([x_min], [y_min], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
                 #self.graph_widget.clear() 
 if __name__ =="__main__":
     app = QApplication(sys.argv)
