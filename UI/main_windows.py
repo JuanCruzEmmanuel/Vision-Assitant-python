@@ -371,13 +371,16 @@ class Main(QMainWindow):
         lista_numerica_ = self.canvas.get_numeric_list()
         for numerica in lista_numerica_:
             if numerica[0]==rowValue[0]:
-                x = numerica[1]
-                y = numerica[2]
-                i_max = np.argmax(y)
-                x_max = x[i_max]
-                y_max = y[i_max]
-                self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
-                #self.graph_widget.clear() 
+                if not numerica[4]:
+                    x = numerica[1]
+                    y = numerica[2]
+                    i_max = np.argmax(y)
+                    x_max = x[i_max]
+                    y_max = y[i_max]
+                    numerica[4].append(x_max)
+                    numerica[4].append(y_max)
+                    self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                    #self.graph_widget.clear() 
     def measure_min_value(self):
         """
         Mide el valor minimo y lo grafica
@@ -391,14 +394,16 @@ class Main(QMainWindow):
         ] #Me devuelve una lista con los valores seleccionado en ese indice
         lista_numerica_ = self.canvas.get_numeric_list()
         for numerica in lista_numerica_:
-            if numerica[0]==rowValue[0]:
-                x = numerica[1]
-                y = numerica[2]
-                i_min = np.argmin(y)
-                x_min = x[i_min]
-                y_min = y[i_min]
-                self.graph_widget.plot([x_min], [y_min], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
-                #self.graph_widget.clear() 
+            if numerica[0]==rowValue[0]: #Aca se comparan los nombres de la lista y del widget lateral.....
+                if not numerica[3]: #Se pregunta si esta vacia
+                    x = numerica[1]
+                    y = numerica[2]
+                    i_min = np.argmin(y)
+                    x_min = x[i_min]
+                    y_min = y[i_min]
+                    numerica[3].append(x_min)
+                    numerica[3].append(y_min)
+                    self.graph_widget.plot([x_min], [y_min], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()
