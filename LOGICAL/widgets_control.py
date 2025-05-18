@@ -231,7 +231,7 @@ class CanvasWidget(QWidget):
                 self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
                 x,y = self.processor.toNumeric(rect=rect)
                 N = len(self.NUMERIC_LIST)
-                self.NUMERIC_LIST.append([f"curve_{N}",x,y])
+                self.NUMERIC_LIST.append([f"curve_{N}",x,y]) #Nombre,x[],y[],(x_min,y_min),(x_max,y_max)
                 self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
                 
             self.start_point = None
