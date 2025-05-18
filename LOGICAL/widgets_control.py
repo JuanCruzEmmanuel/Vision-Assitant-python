@@ -56,6 +56,7 @@ class CanvasWidget(QWidget):
         self.NUMERIC_FLAG = False
         self.NUMERIC_LIST = [] #lista para almacenar los datos
         self.INDEX_NUMERIC = -1 #Significa que no tengo nada
+        self.SELECTED_NUMERIC_SIGNAL= []
         #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
@@ -249,7 +250,6 @@ class CanvasWidget(QWidget):
             self.scale_factor /= 1.1
         self.update()
         
-
     def apply_grayscale(self):
         """
         Funcion encargada de convertir la imagen en blanco y negro.
@@ -259,7 +259,18 @@ class CanvasWidget(QWidget):
         self.save_actions.append(("apply_grayscale",0))
         self.GS = True #atributo que se activa cuando se convierte la imagen en blanco y negro, y acciona sobre el proseso de la imagen
         self.update()
+
+    def set_selected_signal(self,signal):
+        """
+        Guardo el valor seleccionado para luego poder trabajarlo facilmente
+        """
+        self.SELECTED_NUMERIC_SIGNAL = signal
+    def get_selected_signal(self):
         
+        """
+        Devuelve el valor seleccionado
+        """
+        return self.SELECTED_NUMERIC_SIGNAL
     def apply_flip(self):
         
         """

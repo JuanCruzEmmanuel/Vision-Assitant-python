@@ -236,7 +236,10 @@ class ImageProcessor:
         except:
             print("ERROR")
             pass
-    
+
+    def apply_suavizado(self,señal,ventana):
+        return np.convolve(señal, np.ones(ventana)/ventana, mode='same')
+
     
     def OCR(self,rect):
         try:
