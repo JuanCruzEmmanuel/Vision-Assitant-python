@@ -346,6 +346,7 @@ class Main(QMainWindow):
         for numerica in lista_numerica_:
             
             if numerica[0]==rowValue[0]:
+                self.canvas.set_selected_signal(signal=numerica) #La guardo en una variable para luego hacer calculos en caso de necesitarse
                 x = numerica[1]
                 y = numerica[2]
                 self.graph_widget.clear() #Limpio el grafico
