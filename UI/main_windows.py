@@ -344,19 +344,22 @@ class Main(QMainWindow):
         ] #Me devuelve una lista con los valores seleccionado en ese indice
         lista_numerica_ = self.canvas.get_numeric_list()
         for numerica in lista_numerica_:
+            
             if numerica[0]==rowValue[0]:
                 x = numerica[1]
                 y = numerica[2]
-                self.graph_widget.clear()
+                self.graph_widget.clear() #Limpio el grafico
                 self.graph_widget.plot(x, y, pen='r') 
-            if numerica[3]: #En caso que ya exista el minimo
-                self.graph_widget.plot([numerica[3][0]], [numerica[3][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
-            if numerica[4]: #En caso que ya exista el maximo
-                self.graph_widget.plot([numerica[4][0]], [numerica[4][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                if numerica[3]: #En caso que ya exista el minimo
+                    self.graph_widget.plot([numerica[3][0]], [numerica[3][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                if numerica[4]: #En caso que ya exista el maximo
+                    self.graph_widget.plot([numerica[4][0]], [numerica[4][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
     def change_numeric_name(self):
         lista_numerica_ = self.canvas.get_numeric_list()
-        nombre_actualizado = [self.numeric_image_table.item(0, col).text()
-        for col in range(self.numeric_image_table.columnCount())]
+        nombre_actualizado = [
+            self.numeric_image_table.item(row, 0).text()
+            for row in range(self.numeric_image_table.rowCount())
+        ]
         for i in range(len(lista_numerica_)):
             lista_numerica_[i][0] =nombre_actualizado[i]
         self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
@@ -383,8 +386,7 @@ class Main(QMainWindow):
                     y_max = y[i_max]
                     numerica[4].append(x_max)
                     numerica[4].append(y_max)
-                    self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
-                    #self.graph_widget.clear() 
+                    self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10) 
     def measure_min_value(self):
         """
         Mide el valor minimo y lo grafica
