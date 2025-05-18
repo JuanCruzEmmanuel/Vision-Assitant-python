@@ -348,7 +348,11 @@ class Main(QMainWindow):
                 x = numerica[1]
                 y = numerica[2]
                 self.graph_widget.clear()
-                self.graph_widget.plot(x, y, pen='r')  
+                self.graph_widget.plot(x, y, pen='r') 
+            if numerica[3]: #En caso que ya exista el minimo
+                self.graph_widget.plot([numerica[3][0]], [numerica[3][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+            if numerica[4]: #En caso que ya exista el maximo
+                self.graph_widget.plot([numerica[4][0]], [numerica[4][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
     def change_numeric_name(self):
         lista_numerica_ = self.canvas.get_numeric_list()
         nombre_actualizado = [self.numeric_image_table.item(0, col).text()
