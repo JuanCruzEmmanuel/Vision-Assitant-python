@@ -277,7 +277,7 @@ class CanvasWidget(QWidget):
         
         Y = self.processor.apply_suavizado(sgn[2],w)
         
-        self.NUMERIC_LIST.append([NOMBRE,sgn[1],Y,[],[]])
+        self.NUMERIC_LIST.append([NOMBRE,sgn[1][w:-w],Y[w:-w],[],[]])
         print(self.NUMERIC_LIST)
         self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
     def set_selected_signal(self,signal):
