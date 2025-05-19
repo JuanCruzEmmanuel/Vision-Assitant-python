@@ -50,6 +50,7 @@ class Main(QMainWindow):
         
         self.select_kernel = Popup(window_title="Select Kernel", text="Block Size", text2="C") #Creo un popup en caso de necesitarlo
         self.re_scale_popup = Popup(window_title="Select zoom", text="zoom") #Creo un popup en caso de necesitarlo
+        self.select_window_smooth = Popup(window_title="Smooth window select", text="window") #Creo un popup en caso de necesitarlo
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
         self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
@@ -115,6 +116,7 @@ class Main(QMainWindow):
         self.cambiar_nombre_imagen_numerica.clicked.connect(self.change_numeric_name)
         self.max_btn.clicked.connect(self.measure_max_value)
         self.min_btn.clicked.connect(self.measure_min_value)
+        self.smooth_btn.clicked.connect(self.measure_smooth)
         #Atajos de teclado
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
         self.shortcut_flip = QShortcut(QKeySequence("Ctrl+w"), self).activated.connect(self.canvas.apply_flip) #Atajo flip
@@ -411,6 +413,13 @@ class Main(QMainWindow):
                     numerica[3].append(x_min)
                     numerica[3].append(y_min)
                     self.graph_widget.plot([x_min], [y_min], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+    def measure_smooth(self):
+        dialog = self.select_window_smooth
+        if dialog.exec_() == QDialog.Accepted: #Al presionar aceptar
+            w= dialog.getValues()
+            señal = self.canvas.get_selected_signal()
+
+            self.canvas.smooth_signal(sgn=señal,w=w)
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

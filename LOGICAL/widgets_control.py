@@ -260,6 +260,26 @@ class CanvasWidget(QWidget):
         self.GS = True #atributo que se activa cuando se convierte la imagen en blanco y negro, y acciona sobre el proseso de la imagen
         self.update()
 
+    def smooth_signal(self,sgn,w):
+        """
+        Aplica el filtro de suavizado\n
+        :param:
+        **sgn** : señal a filtrar\n
+        **w** : Tamaño de ventana
+        """
+        
+        NOMBRE = sgn[0]+"_smooth" #Cambio el nombre
+        N=0
+        for señal in self.NUMERIC_LIST:
+            if NOMBRE == señal[0]: #En caso que existe el nombre debo cambiarlo
+                N+=1
+                NOMBRE = NOMBRE+f"_{N}"
+        
+        Y = self.processor.apply_suavizado(sgn[2],w)
+        
+        self.NUMERIC_LIST.append([NOMBRE,sgn[1],Y,[],[]])
+        print(self.NUMERIC_LIST)
+        self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
     def set_selected_signal(self,signal):
         """
         Guardo el valor seleccionado para luego poder trabajarlo facilmente
