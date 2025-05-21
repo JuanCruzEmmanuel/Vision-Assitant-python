@@ -46,15 +46,22 @@ Se agrega que el script se pueda utilizar en multiples fotos y continuar editand
 
 ## 1.0.10 
 Se agrega el OCR
+Se agrega la libreria easyocr
+Botones relacionados al guardado de ocr
+Botones para eliminar el OCR
 
 ## 1.1.0 
 Se cambia la interfaz grafica, agregando un stackedWidget
 
 ## 1.1.1 
 Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
+Se agrega shortcut boton derecha para cambiar el la ventana
 
 ## 1.1.2 
 agrego funciones y pyqtgrapgh para la windows 2
+Botones para obtencion del valor minimo y maximo
+boton para realizar suavizado de funcion
+Boton para cambiar el nombre a las señales
 
 
 Status: Development
