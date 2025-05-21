@@ -21,47 +21,47 @@ re structure project. Add color plane extraction
 
 
 ## 1.0.1 
-Proyecto Crece y se agregan funciones mas complejas. A su vez se crea un pipeline que se podra ejecutar siempre de manera automaticazada
+- Proyecto Crece y se agregan funciones mas complejas. A su vez se crea un pipeline que se podra ejecutar siempre de manera automaticazada
 
 ## 1.0.2 
-"Se reinicia" el proyecto buscando un enfoque mas estructurado del mismo. Ahora la UI es mediante qt designer. Se agregan atajos de teclado
+- "Se reinicia" el proyecto buscando un enfoque mas estructurado del mismo. Ahora la UI es mediante qt designer. Se agregan atajos de teclado
 
 ## 1.0.3
-se agregan funcionabilidades como cortar el patron para mas facilidades de trabajo. Se agrega la posibilidad de observar el histograma de la imagen
+- se agregan funcionabilidades como cortar el patron para mas facilidades de trabajo. Se agrega la posibilidad de observar el histograma de la imagen
 
 ## 1.0.4 
-Se agrega el plano de extraccion de colores.
+- Se agrega el plano de extraccion de colores.
 
 ## 1.0.5 
-Se agrega La operacion de colores
+- Se agrega La operacion de colores
 
 ## 1.0.6 
-Se agrega manipulacion de colores en hsv
+- Se agrega manipulacion de colores en hsv
 
 ## 1.0.7 
-Se agrega el boton save scripts
+- Se agrega el boton save scripts
 
 ## 1.0.9 
-Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
+- Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
 
 ## 1.0.10 
-Se agrega el OCR
-Se agrega la libreria easyocr
-Botones relacionados al guardado de ocr
-Botones para eliminar el OCR
+- Se agrega el OCR
+- Se agrega la libreria easyocr
+- Botones relacionados al guardado de ocr
+- Botones para eliminar el OCR
 
 ## 1.1.0 
-Se cambia la interfaz grafica, agregando un stackedWidget
+- Se cambia la interfaz grafica, agregando un stackedWidget
 
 ## 1.1.1 
-Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
-Se agrega shortcut boton derecha para cambiar el la ventana
+- Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
+- Se agrega shortcut boton derecha para cambiar el la ventana
 
 ## 1.1.2 
-agrego funciones y pyqtgrapgh para la windows 2
-Botones para obtencion del valor minimo y maximo
-boton para realizar suavizado de funcion
-Boton para cambiar el nombre a las señales
+- Agrego funciones y pyqtgrapgh para la windows 2
+- Botones para obtencion del valor minimo y maximo
+- Boton para realizar suavizado de funcion
+- Boton para cambiar el nombre a las señales
 
 
 Status: Development
