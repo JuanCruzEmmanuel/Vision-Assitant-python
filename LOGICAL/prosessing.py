@@ -211,37 +211,36 @@ class ImageProcessor:
             print(f"Punto más abajo en ROI: {bottommost}")
     
     def toNumeric(self,rect):
-        if self.cv_image != None:
-            try:
-                ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
-                ROI = cv2.cvtColor(ROI,cv2.COLOR_BGR2GRAY)
-                _, binaria = cv2.threshold(ROI, 127, 255, cv2.THRESH_BINARY)
-                y_indices, x_indices = np.where(binaria == 255)
-                coordenadas_por_x = {}
-                for x, y in zip(x_indices, y_indices):
-                    if x not in coordenadas_por_x:
-                        coordenadas_por_x[x] = []
-                    coordenadas_por_x[x].append(y)
-                # Calcular el valor medio de y para cada x
-                x_unicos = sorted(coordenadas_por_x.keys())
-                y_medios = [np.mean(coordenadas_por_x[x]) for x in x_unicos]
+        try:
+            ROI = self.cv_image[int(rect.y()):int(rect.y())+int(rect.height()),int(rect.x()):int(rect.x())+int(rect.width())]
+            ROI = cv2.cvtColor(ROI,cv2.COLOR_BGR2GRAY)
+            _, binaria = cv2.threshold(ROI, 127, 255, cv2.THRESH_BINARY)
+            y_indices, x_indices = np.where(binaria == 255)
+            coordenadas_por_x = {}
+            for x, y in zip(x_indices, y_indices):
+                if x not in coordenadas_por_x:
+                    coordenadas_por_x[x] = []
+                coordenadas_por_x[x].append(y)
+            # Calcular el valor medio de y para cada x
+            x_unicos = sorted(coordenadas_por_x.keys())
+            y_medios = [np.mean(coordenadas_por_x[x]) for x in x_unicos]
 
-                # Convertir a arrays para trabajar más fácil
-                x_unicos = np.array(x_unicos)
-                y_medios = np.array(y_medios)
-                y_medios = ROI.shape[0] - y_medios
+            # Convertir a arrays para trabajar más fácil
+            x_unicos = np.array(x_unicos)
+            y_medios = np.array(y_medios)
+            y_medios = ROI.shape[0] - y_medios
 
-                #curva_y = np.argmax(ROI, axis=0)
-                #curva_y = ROI.shape[0] - np.argmax(ROI, axis=0)
-                #import matplotlib.pyplot as plt
-                #plt.plot(x_unicos, -y_medios, label='Original', alpha=0.5)
-                #plt.scatter(np.arange(len(curva_y)), curva_y, s=2)  # s=2 controla el tamaño de los puntos
-                #plt.title("Curva extraída desde la imagen")
-                #plt.show()
-                return x_unicos,y_medios
-            except:
-                print("ERROR")
-                pass
+            #curva_y = np.argmax(ROI, axis=0)
+            #curva_y = ROI.shape[0] - np.argmax(ROI, axis=0)
+            #import matplotlib.pyplot as plt
+            #plt.plot(x_unicos, -y_medios, label='Original', alpha=0.5)
+            #plt.scatter(np.arange(len(curva_y)), curva_y, s=2)  # s=2 controla el tamaño de los puntos
+            #plt.title("Curva extraída desde la imagen")
+            #plt.show()
+            return x_unicos,y_medios
+        except:
+            print("ERROR")
+            pass
 
     def apply_suavizado(self,señal,ventana):
         return np.convolve(señal, np.ones(ventana)/ventana, mode='same')

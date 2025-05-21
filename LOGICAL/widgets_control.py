@@ -120,6 +120,13 @@ class CanvasWidget(QWidget):
         print("Se ha guardado el script de manera correcta")
         for N,ACTION in enumerate(self.save_actions):
             print(f"Accion {N}: {ACTION[0]}")
+    
+    def save_action_from_main(self,list):
+        """
+        Guarda en el script
+        """
+        self.save_actions.append(list)
+    
     def load_image(self, file_name):
         self.processor.load_image(file_name) #Cargo la imagen para trabajarla como opencv
         self.qt_image = self.processor.get_qt_image()
@@ -232,7 +239,7 @@ class CanvasWidget(QWidget):
                 self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
                 x,y = self.processor.toNumeric(rect=rect)
                 N = len(self.NUMERIC_LIST)
-                self.NUMERIC_LIST.append([f"curve_{N}",x,y,[],[]]) #Nombre,x[],y[],(x_min,y_min),(x_max,y_max)
+                self.NUMERIC_LIST.append([f"curve_{N}",x,y,[],[],[],[],rect]) #Nombre,x[],y[],(x_min,y_min),(x_max,y_max), dif, (tipo curva,curva padre, valor filtro)
                 self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
                 
             self.start_point = None
@@ -277,7 +284,7 @@ class CanvasWidget(QWidget):
         
         Y = self.processor.apply_suavizado(sgn[2],w)
         
-        self.NUMERIC_LIST.append([NOMBRE,sgn[1][w:-w],Y[w:-w],[],[]])
+        self.NUMERIC_LIST.append([NOMBRE,sgn[1][w:-w],Y[w:-w],[],[],[],["SMOOTH",sgn[0],w]]) #se guarda con  [SMOOTH, la señal padre, w filtro]
         print(self.NUMERIC_LIST)
         self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
     def set_selected_signal(self,signal):

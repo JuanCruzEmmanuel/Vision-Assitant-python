@@ -117,6 +117,7 @@ class Main(QMainWindow):
         self.max_btn.clicked.connect(self.measure_max_value)
         self.min_btn.clicked.connect(self.measure_min_value)
         self.smooth_btn.clicked.connect(self.measure_smooth)
+        self.incrustar.clicked.connect(self.save_signal_value)
         #Atajos de teclado
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
         self.shortcut_flip = QShortcut(QKeySequence("Ctrl+w"), self).activated.connect(self.canvas.apply_flip) #Atajo flip
@@ -420,6 +421,25 @@ class Main(QMainWindow):
             señal = self.canvas.get_selected_signal()
 
             self.canvas.smooth_signal(sgn=señal,w=w)
+    def save_signal_value(self):
+        """
+        Funcion que incrusta la señal en el script
+        """
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()[0]
+        print(lista_numerica_[3],lista_numerica_[4])
+        if not lista_numerica_[6]:
+            self.canvas.save_action_from_main(list = ["image_to_signal",lista_numerica_[-1],lista_numerica_[0]])
+            if lista_numerica_[3]:#Para saber si hay minimo calculado
+                self.canvas.save_action_from_main(list =["min_signal",lista_numerica_[0]])
+            if lista_numerica_[4]:#Para saber si hay maximo calculado
+                self.canvas.save_action_from_main(list =["max_signal",lista_numerica_[0]])
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

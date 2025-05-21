@@ -62,7 +62,10 @@ re structure project. Add color plane extraction
 - Botones para obtencion del valor minimo y maximo
 - Boton para realizar suavizado de funcion
 - Boton para cambiar el nombre a las señales
-
+- Se cambian todo los botones a ingles
+## 1.1.3
+- Se agrega boton de incrustar la curva en el script 
+- Se modifican NUMERIC_LIST agregando el espacio para el metodo de guardado.
 
 Status: Development
 
