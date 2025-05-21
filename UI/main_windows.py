@@ -3,7 +3,8 @@ import os
 import easyocr
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow,QApplication,QFileDialog,QShortcut,QDialog,QTableWidgetItem,QVBoxLayout
+from PyQt5.QtCore import Qt
 from LOGICAL.widgets_control import CanvasWidget
 from UI.color_plane_extractor import PlaneExtractor
 from UI.color_operators import ColorOperator
@@ -11,11 +12,12 @@ from UI.color_manipulation import colorManipulation
 from UI.Select_patern import selectPattern
 from PyQt5.QtGui import QKeySequence
 from UI.generic_popup import Popup
-
+import pyqtgraph as pg
+import numpy as np
 __author__ = "Juan Cruz Noya"
 __country__ = "Argentina"
 __license__ = "MIT"
-__version__ = "1.0.9"
+__version__ = "1.1.2"
 __maintainer__ = "Juan Cruz Noya"
 __email__ = "juancruznoya@unc.edu.ar"
 __status__ = "Production"
@@ -34,6 +36,9 @@ VERSIONES
 1.0.7 Se agrega el boton save scripts
 1.0.9 Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
 1.0.10 Se agrega el OCR
+1.1.0 Se cambia la interfaz grafica, agregando un stackedWidget
+1.1.1 Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
+1.1.2 agrego funciones y pyqtgrapgh para la windows 2
 """
 
 class Main(QMainWindow):
@@ -45,10 +50,21 @@ class Main(QMainWindow):
         
         self.select_kernel = Popup(window_title="Select Kernel", text="Block Size", text2="C") #Creo un popup en caso de necesitarlo
         self.re_scale_popup = Popup(window_title="Select zoom", text="zoom") #Creo un popup en caso de necesitarlo
+        self.select_window_smooth = Popup(window_title="Smooth window select", text="window") #Creo un popup en caso de necesitarlo
         self.extractor_color = PlaneExtractor(cv_imagen=None) #no le cargo imagen
         self.color_operator_popup = ColorOperator(cv_image=None) #No le cargo imagen
         self.color_manipulation_popup = colorManipulation(cv_image=None) #No le cargo imagen
+
+        self.stackedWidget.setCurrentWidget(self.main_page)
+        self.MAIN_FLAG = True
+        ####Agrego visor de imagenes
+        self.graph_widget = pg.PlotWidget() #Creo el objeto a controlar
+        x = np.linspace(0, 10, 1000) #Creo una funcion generica facil de usar
+        y = np.sin(x)
+        self.graph_widget.plot(x, y, pen='r')  
+        
         #Bar Menu actions
+    
         
         self.canvas = CanvasWidget(self.img_conteiner,ocr=self.ocr) #This is the image control and is going to img_conteiner
         
@@ -77,7 +93,6 @@ class Main(QMainWindow):
         
         self.Save_Script.triggered.connect(self.canvas.save_scripts)
         
-        self.Delete_pattern.clicked.connect(self.delete_patron)
         
         self.Select_source_folder.triggered.connect(self.select_folder)
         
@@ -89,9 +104,21 @@ class Main(QMainWindow):
         
         self.OCR_butt.triggered.connect(self.apply_ocr)
         
-        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
-        #Atajos de teclado
+        self.change_to_numeric.triggered.connect(self.change_numeric)
         
+        self.To_numeric.triggered.connect(self.apply_im_to_num)
+
+        
+
+        #BOTONES
+        self.Delete_pattern.clicked.connect(self.delete_patron)
+        self.delete_ocr.clicked.connect(self.delete_selected_ocr)
+        self.cambiar_nombre_imagen_numerica.clicked.connect(self.change_numeric_name)
+        self.max_btn.clicked.connect(self.measure_max_value)
+        self.min_btn.clicked.connect(self.measure_min_value)
+        self.smooth_btn.clicked.connect(self.measure_smooth)
+        self.incrustar.clicked.connect(self.save_signal_value)
+        #Atajos de teclado
         self.shortcut_undo = QShortcut(QKeySequence("Ctrl+z"), self).activated.connect(self.canvas.undo) #Atajo retroceso
         self.shortcut_flip = QShortcut(QKeySequence("Ctrl+w"), self).activated.connect(self.canvas.apply_flip) #Atajo flip
         self.shortcut_gray = QShortcut(QKeySequence("Ctrl+q"), self).activated.connect(self.canvas.apply_grayscale) #Atajo gray scale
@@ -99,14 +126,21 @@ class Main(QMainWindow):
         self.pattern = QShortcut(QKeySequence("Ctrl+p"), self).activated.connect(self.open_patron) #Atajo seleccionar patron imagen
         self.chop = QShortcut(QKeySequence("Ctrl+x"), self).activated.connect(self.canvas.chop_loaded_pattern) #Atajo cortar patron
         self.shortcut_save_scripts =QShortcut(QKeySequence("Ctrl+s"), self).activated.connect(self.canvas.save_scripts) #Atajo Guardar scripts
+        self.change_windows = QShortcut(QKeySequence("Right"), self).activated.connect(self.change_numeric) #Atajo Guardar scripts
         
         #Señales
-        
         self.canvas.patrones_lista.connect(self.update_lista_patrones)
         self.canvas.ocr_lista.connect(self.update_lista_ocr)
+        self.canvas.numeric_list.connect(self.update_lista_numerica)
         
         #Updates
         self.ocr_table.clicked.connect(self.ocr_text)
+        self.numeric_image_table.clicked.connect(self.update_grafico_numerico)
+        
+        
+        layout = QVBoxLayout(self.imagen_numeric)
+        layout.addWidget(self.graph_widget)
+        self.imagen_numeric.setLayout(layout)
     def open_image(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Select image from Files", "", "Image Files (*.png *.jpg *.bmp *.jpeg)", options=options)
@@ -283,6 +317,129 @@ class Main(QMainWindow):
         ] #Me devuelve una lista con los valores seleccionado en ese indice
         #print(rowValue)
         self.OCR_TEXT.setText(rowValue[2])
+        
+    def change_numeric(self):
+        if self.MAIN_FLAG: #Si estoy en la main, cambio
+            self.stackedWidget.setCurrentWidget(self.numeric_page)
+            self.MAIN_FLAG=False #Activo que no estoy en el main
+        else: #Si no estoy en la main, regreso
+            self.stackedWidget.setCurrentWidget(self.main_page)
+            self.MAIN_FLAG = True
+    def apply_im_to_num(self):
+        """
+        Activa la flag para numerico
+        """
+        self.canvas.apply_image_to_numeric()
+        
+    ##Actualizar lista numerica
+    def update_lista_numerica(self,lista_num):
+        self.numeric_image_table.setRowCount(len(lista_num)) #Seteo la cantidad de filas "rows"
+        for row, values in enumerate(lista_num):
+            self.numeric_image_table.setItem(row, 0, QTableWidgetItem(str(values[0]))) #0 nombre; 1=x[~]; 2=y[~]
+            
+    def update_grafico_numerico(self):
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            
+            if numerica[0]==rowValue[0]:
+                self.canvas.set_selected_signal(signal=numerica) #La guardo en una variable para luego hacer calculos en caso de necesitarse
+                x = numerica[1]
+                y = numerica[2]
+                self.graph_widget.clear() #Limpio el grafico
+                self.graph_widget.plot(x, y, pen='r') 
+                if numerica[3]: #En caso que ya exista el minimo
+                    self.graph_widget.plot([numerica[3][0]], [numerica[3][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+                if numerica[4]: #En caso que ya exista el maximo
+                    self.graph_widget.plot([numerica[4][0]], [numerica[4][1]], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+    def change_numeric_name(self):
+        lista_numerica_ = self.canvas.get_numeric_list()
+        nombre_actualizado = [
+            self.numeric_image_table.item(row, 0).text()
+            for row in range(self.numeric_image_table.rowCount())
+        ]
+        for i in range(len(lista_numerica_)):
+            lista_numerica_[i][0] =nombre_actualizado[i]
+        self.canvas.set_numeric_list(lista_numerica=lista_numerica_) #Seteo la nueva lista numerica
+
+    def measure_max_value(self):
+        """
+        Mide el maximo y lo grafica
+        """
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            if numerica[0]==rowValue[0]:
+                if not numerica[4]:
+                    x = numerica[1]
+                    y = numerica[2]
+                    i_max = np.argmax(y)
+                    x_max = x[i_max]
+                    y_max = y[i_max]
+                    numerica[4].append(x_max)
+                    numerica[4].append(y_max)
+                    self.graph_widget.plot([x_max], [y_max], pen=None, symbol='o', symbolBrush='g', symbolSize=10) 
+    def measure_min_value(self):
+        """
+        Mide el valor minimo y lo grafica
+        """
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()
+        for numerica in lista_numerica_:
+            if numerica[0]==rowValue[0]: #Aca se comparan los nombres de la lista y del widget lateral.....
+                if not numerica[3]: #Se pregunta si esta vacia
+                    x = numerica[1]
+                    y = numerica[2]
+                    i_min = np.argmin(y)
+                    x_min = x[i_min]
+                    y_min = y[i_min]
+                    numerica[3].append(x_min)
+                    numerica[3].append(y_min)
+                    self.graph_widget.plot([x_min], [y_min], pen=None, symbol='o', symbolBrush='g', symbolSize=10)
+    def measure_smooth(self):
+        dialog = self.select_window_smooth
+        if dialog.exec_() == QDialog.Accepted: #Al presionar aceptar
+            w= dialog.getValues()
+            señal = self.canvas.get_selected_signal()
+
+            self.canvas.smooth_signal(sgn=señal,w=w)
+    def save_signal_value(self):
+        """
+        Funcion que incrusta la señal en el script
+        """
+        currentRow = self.numeric_image_table.currentRow()
+        if currentRow == -1:
+            pass
+        rowValue = [
+            self.numeric_image_table.item(currentRow, col).text()
+            for col in range(self.numeric_image_table.columnCount())
+        ] #Me devuelve una lista con los valores seleccionado en ese indice
+        lista_numerica_ = self.canvas.get_numeric_list()[0]
+        print(lista_numerica_[3],lista_numerica_[4])
+        if not lista_numerica_[6]:
+            self.canvas.save_action_from_main(list = ["image_to_signal",lista_numerica_[-1],lista_numerica_[0]])
+            if lista_numerica_[3]:#Para saber si hay minimo calculado
+                self.canvas.save_action_from_main(list =["min_signal",lista_numerica_[0]])
+            if lista_numerica_[4]:#Para saber si hay maximo calculado
+                self.canvas.save_action_from_main(list =["max_signal",lista_numerica_[0]])
 if __name__ =="__main__":
     app = QApplication(sys.argv)
     mw = Main()

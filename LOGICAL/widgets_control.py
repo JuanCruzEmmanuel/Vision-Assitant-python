@@ -25,8 +25,9 @@ class logger:
         
 
 class CanvasWidget(QWidget):
-    patrones_lista = pyqtSignal(list)
-    ocr_lista = pyqtSignal(list)
+    patrones_lista = pyqtSignal(list) #Señal que se envia para controlar la tabla de patrones
+    ocr_lista = pyqtSignal(list) #Señal que controla la tabla de ocr
+    numeric_list = pyqtSignal(list) #Señal que controla la lista numerica
     def __init__(self, parent=None,ocr=None):
         super().__init__(parent)
         self.ocr = ocr
@@ -51,6 +52,11 @@ class CanvasWidget(QWidget):
         self.scrip_path = None
         self.OCR_FLAG = False #Variable que controla la accion de el reconocimiento de caracteres en imagen (OCR)
         self.OCR_LIST = []
+        
+        self.NUMERIC_FLAG = False
+        self.NUMERIC_LIST = [] #lista para almacenar los datos
+        self.INDEX_NUMERIC = -1 #Significa que no tengo nada
+        self.SELECTED_NUMERIC_SIGNAL= []
         #self.ocr = easyocr.Reader(['es', 'en'])
     def get_patern_list(self):
         
@@ -82,6 +88,16 @@ class CanvasWidget(QWidget):
         self.OCR_LIST = OCR_list
         self.update()
          
+    def get_numeric_list(self):
+        """
+        Devuelve la lista numerica
+        """
+        return self.NUMERIC_LIST
+    def set_numeric_list(self,lista_numerica):
+        """
+        Setea la lista numerica de manera externa
+        """
+        self.NUMERIC_LIST = lista_numerica
     def save_scripts(self,name="data",path = None):
         """
         Se guardara el scripts en un primer momento formato pickle\n
@@ -104,6 +120,13 @@ class CanvasWidget(QWidget):
         print("Se ha guardado el script de manera correcta")
         for N,ACTION in enumerate(self.save_actions):
             print(f"Accion {N}: {ACTION[0]}")
+    
+    def save_action_from_main(self,list):
+        """
+        Guarda en el script
+        """
+        self.save_actions.append(list)
+    
     def load_image(self, file_name):
         self.processor.load_image(file_name) #Cargo la imagen para trabajarla como opencv
         self.qt_image = self.processor.get_qt_image()
@@ -210,7 +233,15 @@ class CanvasWidget(QWidget):
             #if ok and label:
                 #color = self.get_color_for_label(label)
                 #self.rectangles.append((rect, label, color))
-
+            if self.NUMERIC_FLAG:
+                self.OCR_FLAG=False #desactivo la bandera para evitar conflictos
+                self.CLAMP_FLAG=False #desactivo la bandera para evitar conflictos
+                self.NUMERIC_FLAG=False #desactivo la bandera para evitar conflictos
+                x,y = self.processor.toNumeric(rect=rect)
+                N = len(self.NUMERIC_LIST)
+                self.NUMERIC_LIST.append([f"curve_{N}",x,y,[],[],[],[],rect]) #Nombre,x[],y[],(x_min,y_min),(x_max,y_max), dif, (tipo curva,curva padre, valor filtro)
+                self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
+                
             self.start_point = None
             self.end_point = None
             self.update()
@@ -226,7 +257,6 @@ class CanvasWidget(QWidget):
             self.scale_factor /= 1.1
         self.update()
         
-
     def apply_grayscale(self):
         """
         Funcion encargada de convertir la imagen en blanco y negro.
@@ -236,7 +266,38 @@ class CanvasWidget(QWidget):
         self.save_actions.append(("apply_grayscale",0))
         self.GS = True #atributo que se activa cuando se convierte la imagen en blanco y negro, y acciona sobre el proseso de la imagen
         self.update()
+
+    def smooth_signal(self,sgn,w):
+        """
+        Aplica el filtro de suavizado\n
+        :param:
+        **sgn** : señal a filtrar\n
+        **w** : Tamaño de ventana
+        """
         
+        NOMBRE = sgn[0]+"_smooth" #Cambio el nombre
+        N=0
+        for señal in self.NUMERIC_LIST:
+            if NOMBRE == señal[0]: #En caso que existe el nombre debo cambiarlo
+                N+=1
+                NOMBRE = NOMBRE+f"_{N}"
+        
+        Y = self.processor.apply_suavizado(sgn[2],w)
+        
+        self.NUMERIC_LIST.append([NOMBRE,sgn[1][w:-w],Y[w:-w],[],[],[],["SMOOTH",sgn[0],w]]) #se guarda con  [SMOOTH, la señal padre, w filtro]
+        print(self.NUMERIC_LIST)
+        self.numeric_list.emit(self.NUMERIC_LIST) #Emito la señal
+    def set_selected_signal(self,signal):
+        """
+        Guardo el valor seleccionado para luego poder trabajarlo facilmente
+        """
+        self.SELECTED_NUMERIC_SIGNAL = signal
+    def get_selected_signal(self):
+        
+        """
+        Devuelve el valor seleccionado
+        """
+        return self.SELECTED_NUMERIC_SIGNAL
     def apply_flip(self):
         
         """
@@ -372,7 +433,7 @@ class CanvasWidget(QWidget):
         self.save_actions.append(("apply_color_operators",operation,color))
         
         self.update()
-    
+#*************************************************FLAG******************************************************************
     def apply_clamp(self):
         """
         Activa la flag del clamp
@@ -385,6 +446,11 @@ class CanvasWidget(QWidget):
         """
         self.OCR_FLAG = not self.OCR_FLAG
         
+    def apply_image_to_numeric(self):
+        """
+        Para poder seleccionar la parte donde quiero convertir la imagen en numerico
+        """
+        self.NUMERIC_FLAG = not self.NUMERIC_FLAG
         
     def apply_color_manipulation(self,operation,color1,color2,color_change):
         """

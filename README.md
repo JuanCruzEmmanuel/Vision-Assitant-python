@@ -1,6 +1,4 @@
-Python Vision Assistant for LabView:
-
-The project mainly focuses on implementing a vision assistant similar to the one provided by LabView's paid module. This is primarily to avoid the high cost of that module and because, after years of use, I've identified several issues with color and pattern detection, not to mention its lack of flexibility.
+# OpenVision - Vision Assistant
 
 Version 1.0.0 includes the following features:
 
@@ -17,13 +15,57 @@ Error in black and white convertion ---> SOLVED
 Apply dilate filter
 Apply erode filter
 
-version 1.0.2 includes the fallowin features:
+## version 1.0.2 includes the fallowin features:
 
 re structure project. Add color plane extraction
 
-version 1.0.3 to 1.0.5 include:
 
-colors operations
+## 1.0.1 
+- Proyecto Crece y se agregan funciones mas complejas. A su vez se crea un pipeline que se podra ejecutar siempre de manera automaticazada
+
+## 1.0.2 
+- "Se reinicia" el proyecto buscando un enfoque mas estructurado del mismo. Ahora la UI es mediante qt designer. Se agregan atajos de teclado
+
+## 1.0.3
+- se agregan funcionabilidades como cortar el patron para mas facilidades de trabajo. Se agrega la posibilidad de observar el histograma de la imagen
+
+## 1.0.4 
+- Se agrega el plano de extraccion de colores.
+
+## 1.0.5 
+- Se agrega La operacion de colores
+
+## 1.0.6 
+- Se agrega manipulacion de colores en hsv
+
+## 1.0.7 
+- Se agrega el boton save scripts
+
+## 1.0.9 
+- Se agrega que el script se pueda utilizar en multiples fotos y continuar editando
+
+## 1.0.10 
+- Se agrega el OCR
+- Se agrega la libreria easyocr
+- Botones relacionados al guardado de ocr
+- Botones para eliminar el OCR
+
+## 1.1.0 
+- Se cambia la interfaz grafica, agregando un stackedWidget
+
+## 1.1.1 
+- Se agrega el boton para cambiar de interaz y tambien la conversion de imagen a numerico
+- Se agrega shortcut boton derecha para cambiar el la ventana
+
+## 1.1.2 
+- Agrego funciones y pyqtgrapgh para la windows 2
+- Botones para obtencion del valor minimo y maximo
+- Boton para realizar suavizado de funcion
+- Boton para cambiar el nombre a las señales
+- Se cambian todo los botones a ingles
+## 1.1.3
+- Se agrega boton de incrustar la curva en el script 
+- Se modifican NUMERIC_LIST agregando el espacio para el metodo de guardado.
 
 Status: Development
 
